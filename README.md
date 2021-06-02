@@ -18,3 +18,6 @@ Simple and clean private workspace to take notes, manage productive time blocks,
 - Discipline is a key to success
 - Know where you are spending your time
 - Know what is coming next using timeline feature
+
+# External resources
+- [https://gist.github.com/rxaviers/7360908](Github Emojis)
