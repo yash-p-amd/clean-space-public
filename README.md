@@ -1,6 +1,12 @@
 # clean-space-public
 Simple and clean private workspace to take notes, manage productive time blocks, finance, and long-term goals without wasting cognitive resource. 
 
+# Tools
+- [ViteJS](https://vitejs.dev/)
+- [SvelteJS](https://svelte.dev/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [.NET 5.0](https://dotnet.microsoft.com/download/dotnet/5.0)
+
 # Features
 - [ ] Simple note feature with minimal tools visible on the screen
 - [ ] Calendar forcast view - timeline
@@ -8,7 +14,7 @@ Simple and clean private workspace to take notes, manage productive time blocks,
 - [ ] Intuitive file manager
 - [ ] Does not hostage user data, instead allow users to export all data into well-known format. i.e. `.md` or `.pdf`
 - [ ] Cognitive meter
-- [ ] Personal routines
+- [ ] Personal routines and everyday todo templates
 
 # Marketing
 - Orchestrate your tasks like never before
