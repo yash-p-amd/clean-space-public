@@ -8,6 +8,7 @@ Simple and clean private workspace to take notes, manage productive time blocks,
 - [ ] Intuitive file manager
 - [ ] Does not hostage user data, instead allow users to export all data into well-known format. i.e. `.md` or `.pdf`
 - [ ] Cognitive meter
+- [ ] Personal routines
 
 # Marketing
 - Orchestrate your tasks like never before
