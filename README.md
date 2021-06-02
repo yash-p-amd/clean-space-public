@@ -20,4 +20,4 @@ Simple and clean private workspace to take notes, manage productive time blocks,
 - Know what is coming next using timeline feature
 
 # External resources
-- [https://gist.github.com/rxaviers/7360908](Github Emojis)
+- (Github Emojis)[https://gist.github.com/rxaviers/7360908]
