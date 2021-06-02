@@ -20,4 +20,5 @@ Simple and clean private workspace to take notes, manage productive time blocks,
 - Know what is coming next using timeline feature
 
 # External resources
-- [Github Emojis](https://gist.github.com/rxaviers/7360908)
+- [Github emojis](https://gist.github.com/rxaviers/7360908)
+- [Svelte examples](https://svelte.dev/examples#hello-world)
