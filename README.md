@@ -16,6 +16,7 @@ Simple and clean private workspace to take notes, manage productive time blocks,
 - [ ] Does not hostage user data, instead allow users to export all data into well-known format. i.e. `.md` or `.pdf`
 - [ ] Cognitive meter
 - [ ] Personal routines and everyday todo templates
+- [ ] Finance -> percentage calculator, chart, wealth allocation and overview, decision tree or simulator
 
 # Marketing
 - Orchestrate your tasks like never before
