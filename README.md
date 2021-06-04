@@ -9,6 +9,7 @@ Simple and clean private workspace to take notes, manage productive time blocks,
 
 # Features
 - [ ] Simple note feature with minimal tools visible on the screen
+    - [ ] Section to dump temp notes. Section divided by cards. Never lose unorganized notes
 - [ ] Calendar forcast view - timeline
 - [ ] Todos with performance graph, time logging feature and priority management
 - [ ] Intuitive file manager
