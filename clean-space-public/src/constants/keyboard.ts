@@ -4,4 +4,5 @@ export abstract class Keyboard {
     public static arrowLeft: string = "ArrowLeft";
     public static arrowRight: string = "ArrowRight";
     public static slash: string = "Slash";
+    public static Enter: string = "Enter";
 }

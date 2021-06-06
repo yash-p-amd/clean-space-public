@@ -4,11 +4,12 @@
 
     let isSelectVisible = false;
 
-    let value = "test";
-    let isFocused = false;
-    const onInput = (e) => (value = e.target.value);
-    const onFocus = () => (isFocused = true);
-    const onBlur = () => (isFocused = false);
+    let selectValue = "test";
+    let isSelectFocused = false;
+
+    const onSelectInput = (e) => (selectValue = e.target.value);
+    const onFocus = () => onSelectFocus();
+    const onBlur = () => onSelectBlur();
 
     const onKeyPressDocument = (e) => {
         var keyCode = e.code;
@@ -26,9 +27,19 @@
             isSelectVisible = false;
         }
         console.log(e);
-        console.log(isSelectVisible);
-        console.log(keyCode);
     };
+
+    function onSelectBlur() {
+        isSelectFocused = false;
+        isSelectVisible = false;
+        console.log(selectValue);
+        console.log("Document is in focus");
+    }
+
+    function onSelectFocus() {
+        isSelectFocused = true;
+        console.log("Select is in focus");
+    }
 </script>
 
 <div contenteditable="true" class="cpd-main" on:keydown={onKeyPressDocument}>
@@ -36,9 +47,14 @@
 </div>
 
 {#if isSelectVisible}
-    <Select on:input={onInput} on:focus={onFocus} on:blur={onBlur} {value} />
-    {value}
-    {isFocused}
+    <Select
+        on:input={onSelectInput}
+        on:focus={onFocus}
+        on:blur={onBlur}
+        {selectValue}
+    />
+    {selectValue}
+    {isSelectFocused}
 {/if}
 
 <style>

@@ -2,14 +2,37 @@
     import { getEventsAction } from "../utils/utils";
     import { current_component } from "svelte/internal";
     import { onMount } from "svelte";
+    import { Keyboard } from "../constants/keyboard";
+
     export let value;
-    const events = getEventsAction(current_component);
+
     let itSelf;
+
     onMount(() => itSelf.focus());
+
+    const events = getEventsAction(current_component);
+    const onKeyPressDocument = (e) => {
+        var keyCode = e.code;
+        if (
+            keyCode === Keyboard.arrowUp ||
+            keyCode === Keyboard.arrowDown ||
+            keyCode === Keyboard.arrowLeft ||
+            keyCode === Keyboard.arrowRight
+        ) {
+            return;
+        }
+        itSelf.blur();
+    };
 </script>
 
-<!-- <input use:events {value} /> -->
-<select bind:this={itSelf} use:events {value} class="cpd-select" size="4">
+<select
+    on:keydown={onKeyPressDocument}
+    bind:this={itSelf}
+    use:events
+    {value}
+    class="cpd-select"
+    size="4"
+>
     <option value="volvo">Volvo</option>
     <option value="saab">Saab</option>
     <option value="opel">Opel</option>
