@@ -12,17 +12,21 @@
 
     const events = getEventsAction(current_component);
     const onKeyPressDocument = (e) => {
-        var keyCode = e.code;
         if (
-            keyCode === Keyboard.arrowUp ||
-            keyCode === Keyboard.arrowDown ||
-            keyCode === Keyboard.arrowLeft ||
-            keyCode === Keyboard.arrowRight
+            e.code === Keyboard.arrowUp ||
+            e.code === Keyboard.arrowDown ||
+            e.code === Keyboard.arrowLeft ||
+            e.code === Keyboard.arrowRight
         ) {
             return;
         }
+        if (e.code === Keyboard.Enter) {
+            enterClicked();
+        }
         itSelf.blur();
     };
+
+    function enterClicked() {}
 </script>
 
 <select
@@ -33,10 +37,10 @@
     class="cpd-select"
     size="4"
 >
-    <option value="volvo">Volvo</option>
-    <option value="saab">Saab</option>
-    <option value="opel">Opel</option>
-    <option value="audi">Audi</option>
+    <option value="header1">Header1</option>
+    <option value="header2">Header2</option>
+    <option value="header3">Header3</option>
+    <option value="bullet">Bullet</option>
 </select>
 
 <style>

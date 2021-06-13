@@ -1,61 +1,62 @@
 <script>
     import { Keyboard } from "../constants/keyboard";
-    import Select from "./Select.svelte";
+    import { ConstDocumentTools } from "../constants/documentTools";
+    import DocumentTools from "./DocumentTools.svelte";
 
-    let isSelectVisible = false;
+    let isToolVisible = false;
+    let isToolFocused = false;
+    let value = "header1";
+    let itSelf;
+    $: itSelfValue =
+        "This is some new text,&#10;this text should be on a new line.";
 
-    let selectValue = "test";
-    let isSelectFocused = false;
-
-    const onSelectInput = (e) => (selectValue = e.target.value);
-    const onFocus = () => onSelectFocus();
-    const onBlur = () => onSelectBlur();
-
-    const onKeyPressDocument = (e) => {
-        var keyCode = e.code;
-        if (
-            keyCode === Keyboard.arrowUp ||
-            keyCode === Keyboard.arrowDown ||
-            keyCode === Keyboard.arrowLeft ||
-            keyCode === Keyboard.arrowRight
-        ) {
-            return;
+    const onToolSelect = (e) => {
+        value = e.target.value;
+        if (value === ConstDocumentTools.header1) {
+            itSelfValue = itSelfValue + "&#10;";
+            itSelfValue = itSelfValue + "#";
         }
-        if (!e.ctrlKey && keyCode === Keyboard.slash) {
-            isSelectVisible = isSelectVisible ? false : true;
+        console.log(itSelfValue);
+    };
+    const onToolFocus = () => {
+        itSelf.blur();
+        isToolFocused = true;
+    };
+    const onToolBlur = () => {
+        itSelf.focus();
+        isToolFocused = false;
+        isToolVisible = false;
+    };
+    const onKeyPressDocument = (e) => {
+        if (!e.ctrlKey && e.code === Keyboard.slash) {
+            isToolVisible = isToolVisible ? false : true;
         } else {
-            isSelectVisible = false;
+            isToolVisible = false;
         }
         console.log(e);
     };
-
-    function onSelectBlur() {
-        isSelectFocused = false;
-        isSelectVisible = false;
-        console.log(selectValue);
-        console.log("Document is in focus");
-    }
-
-    function onSelectFocus() {
-        isSelectFocused = true;
-        console.log("Select is in focus");
-    }
 </script>
 
-<div contenteditable="true" class="cpd-main" on:keydown={onKeyPressDocument}>
-    Edit me
+<div
+    bind:this={itSelf}
+    on:keydown={onKeyPressDocument}
+    contenteditable="true"
+    class="cpd-main"
+>
+    {itSelfValue}
 </div>
 
-{#if isSelectVisible}
-    <Select
-        on:input={onSelectInput}
-        on:focus={onFocus}
-        on:blur={onBlur}
-        {selectValue}
+{#if isToolVisible}
+    <DocumentTools
+        on:input={onToolSelect}
+        on:focus={onToolFocus}
+        on:blur={onToolBlur}
+        {value}
     />
-    {selectValue}
-    {isSelectFocused}
 {/if}
+
+{value}
+{isToolFocused}
 
 <style>
     .cpd-main {
@@ -64,5 +65,8 @@
         max-width: 14rem;
         margin: 1rem auto;
         line-height: 1.35;
+    }
+    div {
+        white-space: pre-wrap;
     }
 </style>
