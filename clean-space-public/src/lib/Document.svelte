@@ -9,15 +9,15 @@
     //variables
     let mainHero;
     let toolBox;
-    $: isToolBoxVisible = false;
     $: contentText = "";
+    $: isToolBoxVisible = false;
 
     //custom functionality
-    onMount(async () => {
+    onMount(() => {
         mainHero.focus();
     });
 
-    const onKeyDown = (e) => {
+    const onKeyPress = (e) => {
         if (!e.ctrlKey && e.code === Key.slash) {
             displayToolBox();
         } else {
@@ -37,23 +37,50 @@
 
     function onToolBoxEvent(event) {
         var eventData = event.detail as ToolBoxEvent;
-        console.log(eventData);
         if (eventData.selectedTool === Tool.Bullet) {
-            console.log("Typescript is working fine");
+            contentText = contentText + "<ul><li>Coffee</li></ul>";
+        }
+        if (eventData.selectedTool === Tool.Header1) {
+            contentText =
+                contentText + '<h1 style="color: red"><span>He</span></h1>';
+        }
+        if (eventData.selectedTool === Tool.Header2) {
+            contentText = contentText + '<h2 style="color: red">Header2</h2>';
+        }
+        if (eventData.selectedTool === Tool.Header3) {
+            contentText = contentText + '<h3 style="color: red">Header3</h3>';
         }
         mainHero.focus();
         hideToolBox();
+        setTimeout(setCaret, 10);
+    }
+
+    function setCaret() {
+        console.log("setCaret");
+        var range = document.createRange();
+        var sel = window.getSelection();
+
+        console.log(mainHero);
+        console.log(mainHero.childNodes[mainHero.childNodes.length - 1]);
+        range.setStartAfter(
+            mainHero.childNodes[mainHero.childNodes.length - 1]
+        );
+        range.collapse(true);
+
+        sel.removeAllRanges();
+        sel.addRange(range);
     }
 </script>
 
 <div
     bind:this={mainHero}
-    on:keydown={onKeyDown}
+    bind:innerHTML={contentText}
+    on:keypress={onKeyPress}
     contenteditable="true"
     class="cpd-main"
->
-    {contentText}
-</div>
+/>
+{contentText}
+<pre />
 {#if isToolBoxVisible}
     <ToolBox
         bind:this={toolBox}
@@ -61,7 +88,6 @@
         on:focus={onToolFocus}
     />
 {/if}
-{contentText}
 
 <style>
     .cpd-main {

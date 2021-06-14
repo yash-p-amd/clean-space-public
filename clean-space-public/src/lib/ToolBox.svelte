@@ -24,7 +24,7 @@
         mainHero.focus();
     });
 
-    const onKeyDown = (e) => {
+    const onKeyPress = (e) => {
         if (e.code === Key.Enter) {
             dispatchEvent();
         }
@@ -40,8 +40,8 @@
 <select
     bind:this={mainHero}
     bind:value
-    on:keydown={onKeyDown}
-    on:click={dispatchEvent}
+    on:keypress|stopPropagation={onKeyPress}
+    on:click|stopPropagation={dispatchEvent}
     size={tools.length}
 >
     {#each tools as tool}

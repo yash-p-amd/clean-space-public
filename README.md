@@ -34,3 +34,6 @@ Simple and clean private workspace to take notes, manage productive time blocks,
 - [TypeScript enum guide](https://www.petermorlion.com/iterating-a-typescript-enum/)
 - [JS update caret position](http://jsfiddle.net/timdown/vXnCM/)
 - [Sanitize HTML from a string](https://livebook.manning.com/book/svelte-and-sapper-in-action/chapter-7/v-2/28)
+- [Move cursor to end of line for text area only](https://css-tricks.com/snippets/javascript/move-cursor-to-end-of-input/)
+- [Svelte syntax highlighter for editable content](https://svelte.dev/repl/09058408863b46b7837e645a45c43ff3?version=3.38.2)
+- [Display toolbox right below cursor](https://javascript.plainenglish.io/how-to-find-the-caret-inside-a-contenteditable-element-955a5ad9bf81)
