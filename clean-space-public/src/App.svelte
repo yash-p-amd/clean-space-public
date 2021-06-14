@@ -1,6 +1,5 @@
 <script lang="ts">
   import logo from "./assets/svelte.png";
-  import Counter from "./lib/Counter.svelte";
   import Document from "./lib/Document.svelte";
 </script>
 
@@ -8,7 +7,6 @@
   <img src={logo} alt="Svelte Logo" />
   <h1>Hello Typescript!</h1>
 
-  <Counter />
   <Document />
 
   <p>

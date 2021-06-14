@@ -1,4 +1,4 @@
-export abstract class Keyboard {
+export abstract class Key {
     public static arrowUp: string = "ArrowUp";
     public static arrowDown: string = "ArrowDown";
     public static arrowLeft: string = "ArrowLeft";

@@ -31,3 +31,6 @@ Simple and clean private workspace to take notes, manage productive time blocks,
 # External resources
 - [Github emojis](https://gist.github.com/rxaviers/7360908)
 - [Svelte examples](https://svelte.dev/examples#hello-world)
+- [TypeScript enum guide](https://www.petermorlion.com/iterating-a-typescript-enum/)
+- [JS update caret position](http://jsfiddle.net/timdown/vXnCM/)
+- [Sanitize HTML from a string](https://livebook.manning.com/book/svelte-and-sapper-in-action/chapter-7/v-2/28)

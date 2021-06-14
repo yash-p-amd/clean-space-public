@@ -1,62 +1,67 @@
-<script>
-    import { Keyboard } from "../constants/keyboard";
-    import { ConstDocumentTools } from "../constants/documentTools";
-    import DocumentTools from "./DocumentTools.svelte";
+<script lang="ts">
+    //imports
+    import ToolBox from "./ToolBox.svelte";
+    import { Tool, ToolBoxEvent } from "../statics/ToolBoxEvent";
+    import { Key } from "../constants/Key";
+    import { onMount } from "svelte";
 
-    let isToolVisible = false;
-    let isToolFocused = false;
-    let value = "header1";
-    let itSelf;
-    $: itSelfValue =
-        "This is some new text,&#10;this text should be on a new line.";
+    //svelte constants
+    //variables
+    let mainHero;
+    let toolBox;
+    $: isToolBoxVisible = false;
+    $: contentText = "";
 
-    const onToolSelect = (e) => {
-        value = e.target.value;
-        if (value === ConstDocumentTools.header1) {
-            itSelfValue = itSelfValue + "&#10;";
-            itSelfValue = itSelfValue + "#";
-        }
-        console.log(itSelfValue);
-    };
-    const onToolFocus = () => {
-        itSelf.blur();
-        isToolFocused = true;
-    };
-    const onToolBlur = () => {
-        itSelf.focus();
-        isToolFocused = false;
-        isToolVisible = false;
-    };
-    const onKeyPressDocument = (e) => {
-        if (!e.ctrlKey && e.code === Keyboard.slash) {
-            isToolVisible = isToolVisible ? false : true;
+    //custom functionality
+    onMount(async () => {
+        mainHero.focus();
+    });
+
+    const onKeyDown = (e) => {
+        if (!e.ctrlKey && e.code === Key.slash) {
+            displayToolBox();
         } else {
-            isToolVisible = false;
+            hideToolBox();
         }
-        console.log(e);
     };
+
+    const onToolFocus = () => {};
+
+    const displayToolBox = () => {
+        isToolBoxVisible = true;
+    };
+
+    const hideToolBox = () => {
+        isToolBoxVisible = false;
+    };
+
+    function onToolBoxEvent(event) {
+        var eventData = event.detail as ToolBoxEvent;
+        console.log(eventData);
+        if (eventData.selectedTool === Tool.Bullet) {
+            console.log("Typescript is working fine");
+        }
+        mainHero.focus();
+        hideToolBox();
+    }
 </script>
 
 <div
-    bind:this={itSelf}
-    on:keydown={onKeyPressDocument}
+    bind:this={mainHero}
+    on:keydown={onKeyDown}
     contenteditable="true"
     class="cpd-main"
 >
-    {itSelfValue}
+    {contentText}
 </div>
-
-{#if isToolVisible}
-    <DocumentTools
-        on:input={onToolSelect}
+{#if isToolBoxVisible}
+    <ToolBox
+        bind:this={toolBox}
+        on:message={onToolBoxEvent}
         on:focus={onToolFocus}
-        on:blur={onToolBlur}
-        {value}
     />
 {/if}
-
-{value}
-{isToolFocused}
+{contentText}
 
 <style>
     .cpd-main {
@@ -65,8 +70,5 @@
         max-width: 14rem;
         margin: 1rem auto;
         line-height: 1.35;
-    }
-    div {
-        white-space: pre-wrap;
     }
 </style>
