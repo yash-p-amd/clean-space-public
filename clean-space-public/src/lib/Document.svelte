@@ -4,11 +4,13 @@
     import { Tool, ToolBoxEvent } from "../statics/ToolBoxEvent";
     import { Key } from "../constants/Key";
     import { onMount } from "svelte";
+    import { generateUniqueID } from "../utils/utils";
 
     //svelte constants
     //variables
     let mainHero;
     let toolBox;
+    let trackLastElement: Tool;
     $: contentText = "";
     $: isToolBoxVisible = false;
 
@@ -22,6 +24,9 @@
             displayToolBox();
         } else {
             hideToolBox();
+        }
+        if (e.code === Key.Enter && trackLastElement === Tool.Checkbox) {
+            insertCheckbox();
         }
     };
 
@@ -38,20 +43,65 @@
     function onToolBoxEvent(event) {
         var eventData = event.detail as ToolBoxEvent;
         if (eventData.selectedTool === Tool.Bullet) {
-            contentText = contentText + "<ul><li>Coffee</li></ul>";
+            let uID = generateUniqueID(Tool.Bullet);
+            contentText = contentText + `<ul id=${uID}><li>Bullet</li></ul>`;
+            trackLastElement = Tool.Bullet;
         }
         if (eventData.selectedTool === Tool.Header1) {
+            let uID = generateUniqueID(Tool.Header1);
             contentText =
-                contentText + '<h1 style="color: red"><span>He</span></h1>';
+                contentText +
+                `<h1 id=${uID} style="color: red"><span>Header1</span></h1>`;
+            trackLastElement = Tool.Header1;
         }
         if (eventData.selectedTool === Tool.Header2) {
-            contentText = contentText + '<h2 style="color: red">Header2</h2>';
+            let uID = generateUniqueID(Tool.Header2);
+            contentText =
+                contentText + `<h2 id=${uID} style="color: red">Header2</h2>`;
+            trackLastElement = Tool.Header2;
         }
         if (eventData.selectedTool === Tool.Header3) {
-            contentText = contentText + '<h3 style="color: red">Header3</h3>';
+            let uID = generateUniqueID(Tool.Header3);
+            contentText =
+                contentText + `<h3 id=${uID} style="color: red">Header3</h3>`;
+            trackLastElement = Tool.Header3;
+        }
+        if (eventData.selectedTool === Tool.Header4) {
+            let uID = generateUniqueID(Tool.Header4);
+            contentText =
+                contentText + `<h4 id=${uID} style="color: red">Header4</h4>`;
+            trackLastElement = Tool.Header4;
+        }
+        if (eventData.selectedTool === Tool.Header5) {
+            let uID = generateUniqueID(Tool.Header5);
+            contentText =
+                contentText + `<h5 id=${uID} style="color: red">Header5</h5>`;
+            trackLastElement = Tool.Header5;
+        }
+        if (eventData.selectedTool === Tool.Header6) {
+            let uID = generateUniqueID(Tool.Header6);
+            contentText =
+                contentText + `<h6 id=${uID} style="color: red">Header6</h6>`;
+            trackLastElement = Tool.Header6;
+        }
+        if (eventData.selectedTool === Tool.Checkbox) {
+            let uID = generateUniqueID(Tool.Checkbox);
+            contentText =
+                contentText +
+                `<input id=${uID} type="checkbox"><label for=${uID}>Todo</label><br>`;
+            trackLastElement = Tool.Checkbox;
         }
         mainHero.focus();
         hideToolBox();
+        setTimeout(setCaret, 10);
+    }
+
+    function insertCheckbox() {
+        let uID = generateUniqueID(Tool.Checkbox);
+        contentText =
+            contentText +
+            `<input id=${uID} type="checkbox"><label for=${uID}>Todo</label><br>`;
+        trackLastElement = Tool.Checkbox;
         setTimeout(setCaret, 10);
     }
 
