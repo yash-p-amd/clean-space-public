@@ -1,7 +1,7 @@
 <script lang="ts">
     //imports
     import ToolBox from "./ToolBox.svelte";
-    import { Tool, ToolBoxEvent } from "../statics/ToolBoxEvent";
+    import { Tool, ToolBoxEventData } from "../statics/ToolBoxEvent";
     import { Key } from "../constants/Key";
     import { onMount } from "svelte";
     import { generateUniqueID } from "../utils/utils";
@@ -49,8 +49,8 @@
         isToolBoxVisible = false;
     };
 
-    function onToolBoxEvent(event) {
-        var eventData = event.detail as ToolBoxEvent;
+    const onToolBoxEventData = (event) => {
+        let eventData = event.detail as ToolBoxEventData;
         if (eventData.selectedTool === Tool.Bullet) {
             let uID = generateUniqueID(Tool.Bullet);
             contentText = contentText + `<ul id=${uID}><li>Bullet</li></ul>`;
@@ -103,23 +103,23 @@
         mainHero.focus();
         hideToolBox();
         setTimeout(setCaret, 10);
-    }
+    };
 
-    function insertCheckbox() {
+    const insertCheckbox = () => {
         let uID = generateUniqueID(Tool.Checkbox);
         console.log(contentText);
         contentText =
             contentText +
-            `<br><input id=${uID} type="checkbox"><label for=${uID}>Todo</label>`;
+            `<input id=${uID} type="checkbox"><label for=${uID}>Todo</label>`;
         trackLastElement = Tool.Checkbox;
         console.log(contentText);
         setTimeout(setCaret, 10);
-    }
+    };
 
-    function setCaret() {
+    const setCaret = () => {
         console.log("setCaret");
-        var range = document.createRange();
-        var sel = window.getSelection();
+        let range = document.createRange();
+        let sel = window.getSelection();
 
         console.log(mainHero);
         console.log(mainHero.childNodes[mainHero.childNodes.length - 1]);
@@ -130,7 +130,7 @@
 
         sel.removeAllRanges();
         sel.addRange(range);
-    }
+    };
 </script>
 
 <div
@@ -145,13 +145,14 @@
 {#if isToolBoxVisible}
     <ToolBox
         bind:this={toolBox}
-        on:message={onToolBoxEvent}
+        on:message={onToolBoxEventData}
         on:focus={onToolFocus}
     />
 {/if}
 
 <style>
     .cpd-main {
+        white-space: pre-line;
         border: solid;
         background-color: #eee;
         max-width: 14rem;

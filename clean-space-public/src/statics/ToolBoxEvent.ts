@@ -1,4 +1,4 @@
-export class ToolBoxEvent {
+export class ToolBoxEventData {
     selectedTool: Tool;
 }
 

@@ -1,6 +1,6 @@
 <script lang="ts">
     //imports
-    import { ToolBoxEvent } from "../statics/ToolBoxEvent";
+    import { ToolBoxEventData } from "../statics/ToolBoxEvent";
     import { Tool } from "../statics/ToolBoxEvent";
     import { Key } from "../constants/Key";
     import { createEventDispatcher } from "svelte";
@@ -31,9 +31,9 @@
     };
 
     const dispatchEvent = () => {
-        var event = new ToolBoxEvent();
-        event.selectedTool = value;
-        dispatch("message", event);
+        let eventData = new ToolBoxEventData();
+        eventData.selectedTool = value;
+        dispatch("message", eventData);
     };
 </script>
 
