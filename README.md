@@ -39,7 +39,9 @@ Simple and clean private workspace to take notes, manage productive time blocks,
 - [Display toolbox right below cursor](https://javascript.plainenglish.io/how-to-find-the-caret-inside-a-contenteditable-element-955a5ad9bf81)
 - [Svelte event modifiers](https://dev.to/tanhauhau/7-event-modifiers-in-svelte-you-must-know-27oc)
 - [Get text selection](https://thewebdev.info/2021/05/08/how-to-get-the-caret-index-position-of-a-contenteditable-element-with-javascript/)
-- [svelte-and-sapper-in-action](https://livebook.manning.com/book/svelte-and-sapper-in-action/chapter-7/v-2/38)
+- [Svelte-and-sapper-in-action](https://livebook.manning.com/book/svelte-and-sapper-in-action/chapter-7/v-2/38)
+- [Svelte-keydown-prevent-default](https://svelte.dev/repl/24da9a19ef764b43b74d3bfe804a253e?version=3.20.1)
+- [Svelte-tick](https://svelte.dev/tutorial/tick)
 
 # Ideas
 - First, use simple plain text to let insert user headers then convert it to `html`
