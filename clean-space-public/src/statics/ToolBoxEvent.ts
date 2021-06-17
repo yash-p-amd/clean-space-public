@@ -11,4 +11,5 @@ export enum Tool {
     Header6 = "Header6",
     Bullet = "Bullet",
     Checkbox = "Checkbox",
+    None = "None",
 }

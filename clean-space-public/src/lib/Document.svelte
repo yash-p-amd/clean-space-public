@@ -20,13 +20,22 @@
     });
 
     const onKeyPress = (e) => {
+        console.log(e);
         if (!e.ctrlKey && e.code === Key.slash) {
             displayToolBox();
         } else {
             hideToolBox();
         }
-        if (e.code === Key.Enter && trackLastElement === Tool.Checkbox) {
+        //return;
+        if (
+            !e.shiftKey &&
+            e.code === Key.Enter &&
+            trackLastElement === Tool.Checkbox
+        ) {
             insertCheckbox();
+        }
+        if (e.shiftKey && e.code === Key.Enter) {
+            trackLastElement = Tool.None;
         }
     };
 
@@ -88,7 +97,7 @@
             let uID = generateUniqueID(Tool.Checkbox);
             contentText =
                 contentText +
-                `<input id=${uID} type="checkbox"><label for=${uID}>Todo</label><br>`;
+                `<input id=${uID} type="checkbox"><label for=${uID}>Todo</label>`;
             trackLastElement = Tool.Checkbox;
         }
         mainHero.focus();
@@ -98,10 +107,12 @@
 
     function insertCheckbox() {
         let uID = generateUniqueID(Tool.Checkbox);
+        console.log(contentText);
         contentText =
             contentText +
-            `<input id=${uID} type="checkbox"><label for=${uID}>Todo</label><br>`;
+            `<br><input id=${uID} type="checkbox"><label for=${uID}>Todo</label>`;
         trackLastElement = Tool.Checkbox;
+        console.log(contentText);
         setTimeout(setCaret, 10);
     }
 
