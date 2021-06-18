@@ -21,9 +21,8 @@
     });
 
     const onKeyPress = async (e) => {
-        console.log(e);
         //Only "/"
-        if (e.code === Key.slash && !e.ctrlKey) {
+        if (e.code === Key.slash && !e.shiftKey) {
             toggleToolBox();
             return;
         }
@@ -44,6 +43,7 @@
             trackLastElement = Tool.None;
             return;
         }
+        hideToolBox();
     };
 
     const onToolFocus = () => {};
@@ -52,7 +52,7 @@
         isToolBoxVisible = true;
     };
 
-    const hideToolBox = () => {
+    const hideToolBox = async () => {
         isToolBoxVisible = false;
     };
 
@@ -63,64 +63,68 @@
     const onToolBoxEventData = async (event) => {
         let eventData = event.detail as ToolBoxEventData;
         if (eventData.selectedTool === Tool.Bullet) {
-            setCaret();
-            let uID = generateUniqueID(Tool.Bullet);
-            contentText = contentText + `<ul id=${uID}><li>Bullet</li></ul>`;
-            trackLastElement = Tool.Bullet;
+            globalInsertElement(
+                Tool.Bullet,
+                "<ul id=${uID}><li>Bullet</li></ul>"
+            );
         }
         if (eventData.selectedTool === Tool.Header1) {
-            let uID = generateUniqueID(Tool.Header1);
-            contentText =
-                contentText +
-                `<h1 id=${uID} style="color: red"><span>Header1</span></h1>`;
-            trackLastElement = Tool.Header1;
+            globalInsertElement(
+                Tool.Header1,
+                '<h1 id=${uID} style="color: red">Header1</h1>'
+            );
         }
         if (eventData.selectedTool === Tool.Header2) {
-            let uID = generateUniqueID(Tool.Header2);
-            contentText =
-                contentText + `<h2 id=${uID} style="color: red">Header2</h2>`;
-            trackLastElement = Tool.Header2;
+            globalInsertElement(
+                Tool.Header2,
+                '<h2 id=${uID} style="color: red">Header2</h2>'
+            );
         }
         if (eventData.selectedTool === Tool.Header3) {
-            let uID = generateUniqueID(Tool.Header3);
-            contentText =
-                contentText + `<h3 id=${uID} style="color: red">Header3</h3>`;
-            trackLastElement = Tool.Header3;
+            globalInsertElement(
+                Tool.Header3,
+                '<h3 id=${uID} style="color: red">Header3</h3>'
+            );
         }
         if (eventData.selectedTool === Tool.Header4) {
-            let uID = generateUniqueID(Tool.Header4);
-            contentText =
-                contentText + `<h4 id=${uID} style="color: red">Header4</h4>`;
-            trackLastElement = Tool.Header4;
+            globalInsertElement(
+                Tool.Header4,
+                '<h4 id=${uID} style="color: red">Header4</h4>'
+            );
         }
         if (eventData.selectedTool === Tool.Header5) {
-            let uID = generateUniqueID(Tool.Header5);
-            contentText =
-                contentText + `<h5 id=${uID} style="color: red">Header5</h5>`;
-            trackLastElement = Tool.Header5;
+            globalInsertElement(
+                Tool.Header3,
+                '<h5 id=${uID} style="color: red">Header5</h5>'
+            );
         }
         if (eventData.selectedTool === Tool.Header6) {
-            let uID = generateUniqueID(Tool.Header6);
-            contentText =
-                contentText + `<h6 id=${uID} style="color: red">Header6</h6>`;
-            trackLastElement = Tool.Header6;
+            globalInsertElement(
+                Tool.Header3,
+                '<h6 id=${uID} style="color: red">Header6</h6>'
+            );
         }
         if (eventData.selectedTool === Tool.Checkbox) {
             insertCheckbox();
         }
         mainHero.focus();
         hideToolBox();
-        setCaret();
     };
 
     const insertCheckbox = async () => {
+        globalInsertElement(
+            Tool.Checkbox,
+            '<div><input id=${uID} type="checkbox"><label for=${uID}></label></div>'
+        );
+    };
+
+    const globalInsertElement = async (tool: Tool, innerHtml: string) => {
         setCaret();
-        let uID = generateUniqueID(Tool.Checkbox);
-        contentText =
-            contentText +
-            `<div><input id=${uID} type="checkbox"><label for=${uID}></label></div>`;
+        let uID = generateUniqueID(tool);
+        innerHtml = innerHtml.replace("${uID}", uID);
+        contentText = contentText + innerHtml;
+        trackLastElement = tool;
         setCaret();
-        trackLastElement = Tool.Checkbox;
     };
 
     const insertNewLine = async () => {
