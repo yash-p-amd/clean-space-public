@@ -26,13 +26,20 @@
 
     const onKeyPress = (e) => {
         if (e.code === Key.Enter) {
-            dispatchEvent();
+            let eventData = new ToolBoxEventData();
+            eventData.selectedTool = value;
+            dispatchEvent(eventData);
+            return;
+        }
+        if (e.code === Key.slash && !e.ctrlKey) {
+            let eventData = new ToolBoxEventData();
+            eventData.selectedTool = Tool.None;
+            dispatchEvent(eventData);
+            return;
         }
     };
 
-    const dispatchEvent = () => {
-        let eventData = new ToolBoxEventData();
-        eventData.selectedTool = value;
+    const dispatchEvent = (eventData: ToolBoxEventData) => {
         dispatch("message", eventData);
     };
 </script>

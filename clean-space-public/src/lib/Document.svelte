@@ -9,10 +9,9 @@
 
     //svelte constants
     //variables
-    const setCaretTimeout = 1;
     let mainHero;
     let toolBox;
-    let trackLastElement: Tool;
+    let trackLastElement: Tool = Tool.None;
     $: contentText = "";
     $: isToolBoxVisible = false;
 
@@ -43,21 +42,8 @@
         //"Shift" + "Enter"
         if (e.shiftKey && e.code === Key.Enter) {
             trackLastElement = Tool.None;
-            insertNewLine();
             return;
         }
-
-        //Only "Enter"
-        // if (e.code === Key.Enter) {
-        //     debugger;
-        //     insertNewLine();
-        //     return;
-        // }
-
-        //debugger;
-        //contentText = contentText + e.key;
-        //await tick();
-        //setCaret();
     };
 
     const onToolFocus = () => {};
@@ -77,6 +63,7 @@
     const onToolBoxEventData = async (event) => {
         let eventData = event.detail as ToolBoxEventData;
         if (eventData.selectedTool === Tool.Bullet) {
+            setCaret();
             let uID = generateUniqueID(Tool.Bullet);
             contentText = contentText + `<ul id=${uID}><li>Bullet</li></ul>`;
             trackLastElement = Tool.Bullet;
@@ -119,41 +106,31 @@
             trackLastElement = Tool.Header6;
         }
         if (eventData.selectedTool === Tool.Checkbox) {
-            let uID = generateUniqueID(Tool.Checkbox);
-            contentText =
-                contentText +
-                `<div><input id=${uID} type="checkbox"><label for=${uID}>Todo</label></div>`;
-            trackLastElement = Tool.Checkbox;
+            insertCheckbox();
         }
         mainHero.focus();
         hideToolBox();
-        //setTimeout(setCaret, setCaretTimeout);
-        await tick();
         setCaret();
     };
 
     const insertCheckbox = async () => {
-        await tick();
         setCaret();
         let uID = generateUniqueID(Tool.Checkbox);
         contentText =
             contentText +
-            `<div><input id=${uID} type="checkbox"><label for=${uID}>Todo</label></div>`;
-        await tick();
+            `<div><input id=${uID} type="checkbox"><label for=${uID}></label></div>`;
         setCaret();
         trackLastElement = Tool.Checkbox;
     };
 
     const insertNewLine = async () => {
-        debugger;
         setCaret();
-        //contentText = contentText + `<br>`;
-        //setTimeout(setCaret, setCaretTimeout);
-        await tick();
+        contentText = contentText + `<br>`;
         setCaret();
     };
 
-    const setCaret = () => {
+    const setCaret = async () => {
+        await tick();
         let range = document.createRange();
         let sel = window.getSelection();
 
