@@ -1,8 +1,10 @@
 export class ToolBoxEventData {
     selectedTool: Tool;
+    selectedToolHtml: string;
 }
 
 export enum Tool {
+    None = "None",
     Header1 = "Header1",
     Header2 = "Header2",
     Header3 = "Header3",
@@ -11,5 +13,5 @@ export enum Tool {
     Header6 = "Header6",
     Bullet = "Bullet",
     Checkbox = "Checkbox",
-    None = "None",
+    Card = "Card",
 }

@@ -62,51 +62,7 @@
 
     const onToolBoxEventData = async (event) => {
         let eventData = event.detail as ToolBoxEventData;
-        if (eventData.selectedTool === Tool.Bullet) {
-            globalInsertElement(
-                Tool.Bullet,
-                "<ul id=${uID}><li>Bullet</li></ul>"
-            );
-        }
-        if (eventData.selectedTool === Tool.Header1) {
-            globalInsertElement(
-                Tool.Header1,
-                '<h1 id=${uID} style="color: red">Header1</h1>'
-            );
-        }
-        if (eventData.selectedTool === Tool.Header2) {
-            globalInsertElement(
-                Tool.Header2,
-                '<h2 id=${uID} style="color: red">Header2</h2>'
-            );
-        }
-        if (eventData.selectedTool === Tool.Header3) {
-            globalInsertElement(
-                Tool.Header3,
-                '<h3 id=${uID} style="color: red">Header3</h3>'
-            );
-        }
-        if (eventData.selectedTool === Tool.Header4) {
-            globalInsertElement(
-                Tool.Header4,
-                '<h4 id=${uID} style="color: red">Header4</h4>'
-            );
-        }
-        if (eventData.selectedTool === Tool.Header5) {
-            globalInsertElement(
-                Tool.Header3,
-                '<h5 id=${uID} style="color: red">Header5</h5>'
-            );
-        }
-        if (eventData.selectedTool === Tool.Header6) {
-            globalInsertElement(
-                Tool.Header3,
-                '<h6 id=${uID} style="color: red">Header6</h6>'
-            );
-        }
-        if (eventData.selectedTool === Tool.Checkbox) {
-            insertCheckbox();
-        }
+        globalInsertElement(eventData.selectedTool, eventData.selectedToolHtml);
         mainHero.focus();
         hideToolBox();
     };
@@ -170,11 +126,37 @@
 
 <style>
     .cpd-main {
+        text-align: left;
         white-space: pre-line;
         border: solid;
-        background-color: #eee;
-        max-width: 14rem;
+        /* background-color: #eee; */
+        /* max-width: 14rem; */
         margin: 1rem auto;
         line-height: 1.35;
+    }
+    :global(.forecast) {
+        margin: 0;
+        padding: 0.3rem;
+        background-color: #eee;
+        font: 1rem "Fira Sans", sans-serif;
+    }
+
+    /* :global(.forecast) > h1, */
+    :global(.day-forecast) {
+        margin: 0.5rem;
+        padding: 0.3rem;
+        font-size: 1.2rem;
+    }
+
+    /*Place SVG to right side of a card*/
+    /* :global(.day-forecast) {
+        background: right/contain content-box border-box no-repeat
+            url("../../public/favicon.ico") white;
+    } */
+
+    /* :global(.day-forecast) > h2, */
+    :global(.day-forecast) > p {
+        margin: 0.2rem;
+        font-size: 1rem;
     }
 </style>
