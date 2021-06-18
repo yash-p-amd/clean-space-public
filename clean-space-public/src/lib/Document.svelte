@@ -138,8 +138,6 @@
         let range = document.createRange();
         let sel = window.getSelection();
 
-        console.log(mainHero);
-        console.log(mainHero.childNodes[mainHero.childNodes.length - 1]);
         range.setStartAfter(
             mainHero.childNodes[mainHero.childNodes.length - 1]
         );
