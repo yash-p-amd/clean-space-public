@@ -31,3 +31,18 @@ Simple and clean private workspace to take notes, manage productive time blocks,
 # External resources
 - [Github emojis](https://gist.github.com/rxaviers/7360908)
 - [Svelte examples](https://svelte.dev/examples#hello-world)
+- [TypeScript enum guide](https://www.petermorlion.com/iterating-a-typescript-enum/)
+- [JS update caret position](http://jsfiddle.net/timdown/vXnCM/)
+- [Sanitize HTML from a string](https://livebook.manning.com/book/svelte-and-sapper-in-action/chapter-7/v-2/28)
+- [Move cursor to end of line for text area only](https://css-tricks.com/snippets/javascript/move-cursor-to-end-of-input/)
+- [Svelte syntax highlighter for editable content](https://svelte.dev/repl/09058408863b46b7837e645a45c43ff3?version=3.38.2)
+- [Display toolbox right below cursor](https://javascript.plainenglish.io/how-to-find-the-caret-inside-a-contenteditable-element-955a5ad9bf81)
+- [Svelte event modifiers](https://dev.to/tanhauhau/7-event-modifiers-in-svelte-you-must-know-27oc)
+- [Get text selection](https://thewebdev.info/2021/05/08/how-to-get-the-caret-index-position-of-a-contenteditable-element-with-javascript/)
+- [Svelte-and-sapper-in-action](https://livebook.manning.com/book/svelte-and-sapper-in-action/chapter-7/v-2/38)
+- [Svelte-keydown-prevent-default](https://svelte.dev/repl/24da9a19ef764b43b74d3bfe804a253e?version=3.20.1)
+- [Svelte-tick](https://svelte.dev/tutorial/tick)
+
+# Ideas
+- First, use simple plain text to let insert user headers then convert it to `html`
+- [Link](https://www.seanmcp.com/articles/set-innerhtml-of-an-element-in-svelte/)
