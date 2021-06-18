@@ -1,6 +1,7 @@
 <script lang="ts">
     //imports
     import ToolBox from "./ToolBox.svelte";
+    import { tick } from "svelte";
     import { Tool, ToolBoxEventData } from "../statics/ToolBoxEvent";
     import { Key } from "../constants/Key";
     import { onMount } from "svelte";
@@ -8,6 +9,7 @@
 
     //svelte constants
     //variables
+    const setCaretTimeout = 1;
     let mainHero;
     let toolBox;
     let trackLastElement: Tool;
@@ -19,24 +21,43 @@
         mainHero.focus();
     });
 
-    const onKeyPress = (e) => {
+    const onKeyPress = async (e) => {
         console.log(e);
-        if (!e.ctrlKey && e.code === Key.slash) {
-            displayToolBox();
-        } else {
-            hideToolBox();
+        //Only "/"
+        if (e.code === Key.slash && !e.ctrlKey) {
+            toggleToolBox();
+            return;
         }
-        //return;
+
+        //Only "Enter" after checkbox
         if (
-            !e.shiftKey &&
             e.code === Key.Enter &&
+            !e.shiftKey &&
             trackLastElement === Tool.Checkbox
         ) {
+            e.preventDefault();
             insertCheckbox();
+            return;
         }
+
+        //"Shift" + "Enter"
         if (e.shiftKey && e.code === Key.Enter) {
             trackLastElement = Tool.None;
+            insertNewLine();
+            return;
         }
+
+        //Only "Enter"
+        // if (e.code === Key.Enter) {
+        //     debugger;
+        //     insertNewLine();
+        //     return;
+        // }
+
+        //debugger;
+        //contentText = contentText + e.key;
+        //await tick();
+        //setCaret();
     };
 
     const onToolFocus = () => {};
@@ -49,7 +70,11 @@
         isToolBoxVisible = false;
     };
 
-    const onToolBoxEventData = (event) => {
+    const toggleToolBox = () => {
+        isToolBoxVisible = isToolBoxVisible ? false : true;
+    };
+
+    const onToolBoxEventData = async (event) => {
         let eventData = event.detail as ToolBoxEventData;
         if (eventData.selectedTool === Tool.Bullet) {
             let uID = generateUniqueID(Tool.Bullet);
@@ -97,27 +122,38 @@
             let uID = generateUniqueID(Tool.Checkbox);
             contentText =
                 contentText +
-                `<input id=${uID} type="checkbox"><label for=${uID}>Todo</label>`;
+                `<div><input id=${uID} type="checkbox"><label for=${uID}>Todo</label></div>`;
             trackLastElement = Tool.Checkbox;
         }
         mainHero.focus();
         hideToolBox();
-        setTimeout(setCaret, 10);
+        //setTimeout(setCaret, setCaretTimeout);
+        await tick();
+        setCaret();
     };
 
-    const insertCheckbox = () => {
+    const insertCheckbox = async () => {
+        await tick();
+        setCaret();
         let uID = generateUniqueID(Tool.Checkbox);
-        console.log(contentText);
         contentText =
             contentText +
-            `<input id=${uID} type="checkbox"><label for=${uID}>Todo</label>`;
+            `<div><input id=${uID} type="checkbox"><label for=${uID}>Todo</label></div>`;
+        await tick();
+        setCaret();
         trackLastElement = Tool.Checkbox;
-        console.log(contentText);
-        setTimeout(setCaret, 10);
+    };
+
+    const insertNewLine = async () => {
+        debugger;
+        setCaret();
+        //contentText = contentText + `<br>`;
+        //setTimeout(setCaret, setCaretTimeout);
+        await tick();
+        setCaret();
     };
 
     const setCaret = () => {
-        console.log("setCaret");
         let range = document.createRange();
         let sel = window.getSelection();
 
@@ -136,12 +172,15 @@
 <div
     bind:this={mainHero}
     bind:innerHTML={contentText}
-    on:keypress={onKeyPress}
+    on:keypress|stopPropagation={onKeyPress}
     contenteditable="true"
     class="cpd-main"
 />
+
 {contentText}
+
 <pre />
+
 {#if isToolBoxVisible}
     <ToolBox
         bind:this={toolBox}
