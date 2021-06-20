@@ -11,7 +11,7 @@
     //variables
     let mainHero;
     let toolBox;
-    let trackLastElement: Tool = Tool.None;
+    //let trackLastElement: Tool = Tool.None;
     $: contentText = "";
     $: isToolBoxVisible = false;
 
@@ -38,21 +38,21 @@
         // }
 
         //Checkbox -> "Enter"
-        if (
-            e.code === Key.Enter &&
-            !e.shiftKey &&
-            trackLastElement === Tool.Checkbox
-        ) {
-            e.preventDefault();
-            insertCheckbox();
-            return;
-        }
+        // if (
+        //     e.code === Key.Enter &&
+        //     !e.shiftKey &&
+        //     trackLastElement === Tool.Checkbox
+        // ) {
+        //     e.preventDefault();
+        //     insertCheckbox();
+        //     return;
+        // }
 
         //"Shift" + "Enter"
-        if (e.shiftKey && e.code === Key.Enter) {
-            trackLastElement = Tool.None;
-            return;
-        }
+        // if (e.shiftKey && e.code === Key.Enter) {
+        //     //trackLastElement = Tool.None;
+        //     return;
+        // }
         hideToolBox();
     };
 
@@ -92,8 +92,8 @@
         contentText = replaceAllRegEx(contentText, /<div><br><\/div>$/gim, "");
         contentText = replaceAllRegEx(
             contentText,
-            / &nbsp;<\/div>$/gim,
-            "</div>"
+            /<div>&nbsp;<\/div>$/gim,
+            ""
         );
         contentText = replaceAllRegEx(contentText, /<br>$/gim, "");
 
@@ -102,7 +102,7 @@
         let uID = generateUniqueID(tool);
         innerHtml = innerHtml.replaceAll("${uID}", uID);
         contentText = contentText + innerHtml;
-        trackLastElement = tool;
+        //trackLastElement = tool;
         setCaret();
     };
 
