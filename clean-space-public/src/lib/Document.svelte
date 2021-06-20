@@ -5,7 +5,7 @@
     import { Tool, ToolBoxEventData } from "../statics/ToolBoxEvent";
     import { Key } from "../constants/Key";
     import { onMount } from "svelte";
-    import { generateUniqueID } from "../utils/utils";
+    import { generateUniqueID, replaceAllRegEx } from "../utils/utils";
 
     //svelte constants
     //variables
@@ -21,13 +21,23 @@
     });
 
     const onKeyPress = async (e) => {
-        //Only "/"
+        //"/"
         if (e.code === Key.slash && !e.shiftKey) {
             toggleToolBox();
             return;
         }
 
-        //Only "Enter" after checkbox
+        //"Enter"
+        // if (e.code === Key.Enter) {
+        //     debugger;
+        //     if (isCurrentLineEmpty()) {
+        //         e.preventDefault();
+        //         return;
+        //     }
+        //     return;
+        // }
+
+        //Checkbox -> "Enter"
         if (
             e.code === Key.Enter &&
             !e.shiftKey &&
@@ -76,8 +86,21 @@
 
     const globalInsertElement = async (tool: Tool, innerHtml: string) => {
         setCaret();
+
+        await tick();
+
+        contentText = replaceAllRegEx(contentText, /<div><br><\/div>$/gim, "");
+        contentText = replaceAllRegEx(
+            contentText,
+            / &nbsp;<\/div>$/gim,
+            "</div>"
+        );
+        contentText = replaceAllRegEx(contentText, /<br>$/gim, "");
+
+        await tick();
+
         let uID = generateUniqueID(tool);
-        innerHtml = innerHtml.replace("${uID}", uID);
+        innerHtml = innerHtml.replaceAll("${uID}", uID);
         contentText = contentText + innerHtml;
         trackLastElement = tool;
         setCaret();
@@ -91,6 +114,7 @@
 
     const setCaret = async () => {
         await tick();
+        console.log(contentText);
         let range = document.createRange();
         let sel = window.getSelection();
 
@@ -101,6 +125,17 @@
 
         sel.removeAllRanges();
         sel.addRange(range);
+    };
+
+    const isCurrentLineEmpty = () => {
+        debugger;
+        var docSelection = document.getSelection();
+        if (docSelection.anchorNode.data === undefined) {
+            if (docSelection.anchorNode.innerText === undefined) {
+                return true;
+            }
+        }
+        return false;
     };
 </script>
 

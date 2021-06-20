@@ -1,4 +1,4 @@
-import { bubble, listen } from "svelte/internal";
+import { bubble, debug, listen } from "svelte/internal";
 import { Tool } from "../statics/ToolBoxEvent";
 
 export function getEventsAction(component) {
@@ -45,3 +45,16 @@ export function generateUniqueID(toolType: Tool) {
     }
     return uID;
 }
+
+export function replaceAllRegEx(input: string, regex: RegExp, replace: string): string {
+    debugger;
+
+    let matches;
+    if ((matches = regex.exec(input)) !== null) {
+        matches.forEach((match, groupIndex) => {
+            input = input.replaceAll(regex, replace);
+        });
+    }
+    return input;
+}
+
