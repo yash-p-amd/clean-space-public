@@ -5,13 +5,13 @@
     import { Tool, ToolBoxEventData } from "../statics/ToolBoxEvent";
     import { Key } from "../constants/Key";
     import { onMount } from "svelte";
-    import { generateUniqueID } from "../utils/utils";
+    import { generateUniqueID, replaceAllRegEx } from "../utils/utils";
 
     //svelte constants
     //variables
     let mainHero;
     let toolBox;
-    let trackLastElement: Tool = Tool.None;
+    //let trackLastElement: Tool = Tool.None;
     $: contentText = "";
     $: isToolBoxVisible = false;
 
@@ -21,28 +21,38 @@
     });
 
     const onKeyPress = async (e) => {
-        //Only "/"
+        //"/"
         if (e.code === Key.slash && !e.shiftKey) {
             toggleToolBox();
             return;
         }
 
-        //Only "Enter" after checkbox
-        if (
-            e.code === Key.Enter &&
-            !e.shiftKey &&
-            trackLastElement === Tool.Checkbox
-        ) {
-            e.preventDefault();
-            insertCheckbox();
-            return;
-        }
+        //"Enter"
+        // if (e.code === Key.Enter) {
+        //     debugger;
+        //     if (isCurrentLineEmpty()) {
+        //         e.preventDefault();
+        //         return;
+        //     }
+        //     return;
+        // }
+
+        //Checkbox -> "Enter"
+        // if (
+        //     e.code === Key.Enter &&
+        //     !e.shiftKey &&
+        //     trackLastElement === Tool.Checkbox
+        // ) {
+        //     e.preventDefault();
+        //     insertCheckbox();
+        //     return;
+        // }
 
         //"Shift" + "Enter"
-        if (e.shiftKey && e.code === Key.Enter) {
-            trackLastElement = Tool.None;
-            return;
-        }
+        // if (e.shiftKey && e.code === Key.Enter) {
+        //     //trackLastElement = Tool.None;
+        //     return;
+        // }
         hideToolBox();
     };
 
@@ -62,51 +72,7 @@
 
     const onToolBoxEventData = async (event) => {
         let eventData = event.detail as ToolBoxEventData;
-        if (eventData.selectedTool === Tool.Bullet) {
-            globalInsertElement(
-                Tool.Bullet,
-                "<ul id=${uID}><li>Bullet</li></ul>"
-            );
-        }
-        if (eventData.selectedTool === Tool.Header1) {
-            globalInsertElement(
-                Tool.Header1,
-                '<h1 id=${uID} style="color: red">Header1</h1>'
-            );
-        }
-        if (eventData.selectedTool === Tool.Header2) {
-            globalInsertElement(
-                Tool.Header2,
-                '<h2 id=${uID} style="color: red">Header2</h2>'
-            );
-        }
-        if (eventData.selectedTool === Tool.Header3) {
-            globalInsertElement(
-                Tool.Header3,
-                '<h3 id=${uID} style="color: red">Header3</h3>'
-            );
-        }
-        if (eventData.selectedTool === Tool.Header4) {
-            globalInsertElement(
-                Tool.Header4,
-                '<h4 id=${uID} style="color: red">Header4</h4>'
-            );
-        }
-        if (eventData.selectedTool === Tool.Header5) {
-            globalInsertElement(
-                Tool.Header3,
-                '<h5 id=${uID} style="color: red">Header5</h5>'
-            );
-        }
-        if (eventData.selectedTool === Tool.Header6) {
-            globalInsertElement(
-                Tool.Header3,
-                '<h6 id=${uID} style="color: red">Header6</h6>'
-            );
-        }
-        if (eventData.selectedTool === Tool.Checkbox) {
-            insertCheckbox();
-        }
+        globalInsertElement(eventData.selectedTool, eventData.selectedToolHtml);
         mainHero.focus();
         hideToolBox();
     };
@@ -120,10 +86,23 @@
 
     const globalInsertElement = async (tool: Tool, innerHtml: string) => {
         setCaret();
+
+        await tick();
+
+        contentText = replaceAllRegEx(contentText, /<div><br><\/div>$/gim, "");
+        contentText = replaceAllRegEx(
+            contentText,
+            /<div>&nbsp;<\/div>$/gim,
+            ""
+        );
+        contentText = replaceAllRegEx(contentText, /<br>$/gim, "");
+
+        await tick();
+
         let uID = generateUniqueID(tool);
-        innerHtml = innerHtml.replace("${uID}", uID);
+        innerHtml = innerHtml.replaceAll("${uID}", uID);
         contentText = contentText + innerHtml;
-        trackLastElement = tool;
+        //trackLastElement = tool;
         setCaret();
     };
 
@@ -135,6 +114,7 @@
 
     const setCaret = async () => {
         await tick();
+        console.log(contentText);
         let range = document.createRange();
         let sel = window.getSelection();
 
@@ -145,6 +125,17 @@
 
         sel.removeAllRanges();
         sel.addRange(range);
+    };
+
+    const isCurrentLineEmpty = () => {
+        debugger;
+        var docSelection = document.getSelection();
+        if (docSelection.anchorNode.data === undefined) {
+            if (docSelection.anchorNode.innerText === undefined) {
+                return true;
+            }
+        }
+        return false;
     };
 </script>
 
@@ -170,11 +161,37 @@
 
 <style>
     .cpd-main {
+        text-align: left;
         white-space: pre-line;
         border: solid;
-        background-color: #eee;
-        max-width: 14rem;
+        /* background-color: #eee; */
+        /* max-width: 14rem; */
         margin: 1rem auto;
         line-height: 1.35;
+    }
+    :global(.forecast) {
+        margin: 0;
+        padding: 0.3rem;
+        background-color: #eee;
+        font: 1rem "Fira Sans", sans-serif;
+    }
+
+    /* :global(.forecast) > h1, */
+    :global(.day-forecast) {
+        margin: 0.5rem;
+        padding: 0.3rem;
+        font-size: 1.2rem;
+    }
+
+    /*Place SVG to right side of a card*/
+    /* :global(.day-forecast) {
+        background: right/contain content-box border-box no-repeat
+            url("../../public/favicon.ico") white;
+    } */
+
+    /* :global(.day-forecast) > h2, */
+    :global(.day-forecast) > p {
+        margin: 0.2rem;
+        font-size: 1rem;
     }
 </style>
