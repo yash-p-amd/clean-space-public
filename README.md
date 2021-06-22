@@ -42,6 +42,7 @@ Simple and clean private workspace to take notes, manage productive time blocks,
 - [Svelte-and-sapper-in-action](https://livebook.manning.com/book/svelte-and-sapper-in-action/chapter-7/v-2/38)
 - [Svelte-keydown-prevent-default](https://svelte.dev/repl/24da9a19ef764b43b74d3bfe804a253e?version=3.20.1)
 - [Svelte-tick](https://svelte.dev/tutorial/tick)
+- [Insert element at caret](https://stackoverflow.com/questions/2920150/insert-text-at-cursor-in-a-content-editable-div)
 
 # Ideas
 - First, use simple plain text to let insert user headers then convert it to `html`

@@ -47,8 +47,6 @@ export function generateUniqueID(toolType: Tool) {
 }
 
 export function replaceAllRegEx(input: string, regex: RegExp, replace: string): string {
-    debugger;
-
     let matches;
     if ((matches = regex.exec(input)) !== null) {
         matches.forEach((match, groupIndex) => {
