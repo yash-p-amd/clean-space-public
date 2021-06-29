@@ -5,6 +5,7 @@ export class ToolBoxEventData {
 
 export enum Tool {
     None = "None",
+    Div = "Div",
     Header1 = "Header1",
     Header2 = "Header2",
     Header3 = "Header3",
