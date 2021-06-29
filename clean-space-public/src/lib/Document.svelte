@@ -5,13 +5,18 @@
     import { Tool, ToolBoxEventData } from "../statics/ToolBoxEvent";
     import { Key } from "../constants/Key";
     import { onMount } from "svelte";
-    import { generateUniqueID, replaceAllRegEx } from "../utils/utils";
+    import {
+        generateUniqueID,
+        replaceAllRegEx,
+        rangeManipulation,
+    } from "../utils/utils";
     import { debug } from "svelte/internal";
 
     //svelte constants
     //variables
     let mainHero;
     let toolBox;
+    const mainHeroId: string = "cpd-id-main";
     $: contentHtml = "";
     $: isToolBoxVisible = false;
 
@@ -19,9 +24,12 @@
     onMount(() => {
         mainHero.focus();
         const child = document.createElement("div");
-        child.setAttribute("id", "Div1");
+        //child.setAttribute("id", "Div1");
         child.textContent = "Edit me!";
-        mainHero.appendChild(child);
+        //mainHero.appendChild(child);
+        //debugger;
+
+        contentHtml = contentHtml + `<div>Edit Me!!</div>`;
         //contentHtml = contentHtml + child.innerHTML;
     });
 
@@ -63,6 +71,8 @@
     };
 
     const globalInsertElement = async (tool: Tool, innerHtml: string) => {
+        await tick();
+
         contentHtml = replaceAllRegEx(contentHtml, /<div><br><\/div>$/gim, "");
         contentHtml = replaceAllRegEx(
             contentHtml,
@@ -74,15 +84,15 @@
         let uID = generateUniqueID(tool);
         innerHtml = innerHtml.replaceAll("${uID}", uID);
         contentHtml = contentHtml + innerHtml;
-        insertHtmlAfterSelection(innerHtml);
+        var frag = insertHtmlAfterSelection(innerHtml);
 
-        await tick();
-
-        setCaret();
+        if (frag !== null) {
+            setCaret(frag, uID);
+        }
     };
 
-    function insertHtmlAfterSelection(html) {
-        var sel, range, node;
+    async function insertHtmlAfterSelection(html: string): Node {
+        var sel, range: Range, node;
         if (window.getSelection) {
             sel = window.getSelection();
             if (sel.getRangeAt && sel.rangeCount) {
@@ -93,34 +103,56 @@
                 // non-standard and not supported in all browsers (IE9, for one)
                 var el = document.createElement("div");
                 el.innerHTML = html;
-                var frag = document.createDocumentFragment(),
+                var frag: DocumentFragment = document.createDocumentFragment(),
                     node,
                     lastNode;
                 while ((node = el.firstChild)) {
                     lastNode = frag.appendChild(node);
                 }
-                range.insertNode(frag);
-                contentHtml =
-                    range.commonAncestorContainer.parentNode.innerHTML;
+                //range.insertNode(frag);
+
+                var referenceNode: Node;
+                if (range.endContainer.parentNode.id != mainHeroId) {
+                    referenceNode = range.endContainer.parentNode;
+                } else {
+                    referenceNode = range.endContainer;
+                }
+
+                mainHero.insertBefore(frag, referenceNode.nextSibling);
+                contentHtml = mainHero.innerHTML;
+
+                await tick();
+                return frag;
             }
         } else if (document.selection && document.selection.createRange) {
             range = document.selection.createRange();
             range.collapse(false);
             range.pasteHTML(html);
+            return null;
         }
     }
 
-    const setCaret = async () => {
+    const setCaret = async (frag: Node, uID: string) => {
         await tick();
         console.log(contentHtml);
         let range = document.createRange();
         let sel = window.getSelection();
 
-        debugger;
-        range.setStartAfter(
-            mainHero.childNodes[mainHero.childNodes.length - 1]
+        //debugger;
+
+        var ind = rangeManipulation.getIndexOfElementInNodesByElementId(
+            mainHero.childNodes,
+            uID
         );
-        range.collapse(true);
+        console.log(ind);
+        //range.setStartAfter(
+        //mainHero.childNodes[mainHero.childNodes.length - 1]
+        //mainHero.childNodes[0]
+        //);
+        //range.setStart()
+        //range.setStartAfter(frag);
+        //range.setStartBefore(frag);
+        range.collapse(false);
 
         sel.removeAllRanges();
         sel.addRange(range);
@@ -135,6 +167,7 @@
     on:keypress|stopPropagation={onKeyPress}
     contenteditable="true"
     class="cpd-main"
+    id={mainHeroId}
 />
 
 <pre />

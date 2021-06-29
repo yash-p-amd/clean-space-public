@@ -59,3 +59,28 @@ export function replaceAllRegEx(input: string, regex: RegExp, replace: string): 
     return input;
 }
 
+const fnExtractElementId = (node: Node): string => {
+    console.log(node);
+    return "";
+}
+
+const fnGetIndexOfElementInNodesByElementId = (nodes: Node[], elementId: string): number => {
+
+    let index = 0;
+    nodes.forEach((node, parentIndex) => {
+        node.childNodes.forEach((childNode, index) => {
+            if (childNode.id == elementId) {
+                index = parentIndex;
+            }
+        });
+    });
+
+    return index;
+}
+
+export const rangeManipulation = {
+    extractElementId: fnExtractElementId,
+    getIndexOfElementInNodesByElementId: fnGetIndexOfElementInNodesByElementId
+}
+
+
