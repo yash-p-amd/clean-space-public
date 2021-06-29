@@ -12,7 +12,6 @@
     //variables
     let mainHero;
     let toolBox;
-    //let trackLastElement: Tool = Tool.None;
     $: contentHtml = "";
     $: isToolBoxVisible = false;
 
@@ -26,63 +25,12 @@
         //contentHtml = contentHtml + child.innerHTML;
     });
 
-    // function (event) {
-    // 	key = event.key;
-    // 	keyCode = event.keyCode;
-    // }
-
-    const handleKeydown = (e) => {
-        if (
-            e.code === Key.arrowUp ||
-            e.code === Key.arrowDown ||
-            e.code === Key.arrowLeft ||
-            e.code === Key.arrowRight
-        ) {
-            //debugger;
-        }
-    };
-
     const onKeyPress = async (e) => {
         //"/"
         if (e.code === Key.slash && !e.shiftKey) {
             toggleToolBox();
             return;
         }
-
-        trackCurrentNode();
-
-        if (e.code === Key.Enter && !e.shiftKey) {
-            //await tick();
-            e.preventDefault();
-            insertNewLine();
-        }
-
-        //"Enter"
-        // if (e.code === Key.Enter) {
-        //     debugger;
-        //     if (isCurrentLineEmpty()) {
-        //         e.preventDefault();
-        //         return;
-        //     }
-        //     return;
-        // }
-
-        //Checkbox -> "Enter"
-        // if (
-        //     e.code === Key.Enter &&
-        //     !e.shiftKey &&
-        //     trackLastElement === Tool.Checkbox
-        // ) {
-        //     e.preventDefault();
-        //     insertCheckbox();
-        //     return;
-        // }
-
-        //"Shift" + "Enter"
-        // if (e.shiftKey && e.code === Key.Enter) {
-        //     //trackLastElement = Tool.None;
-        //     return;
-        // }
         hideToolBox();
     };
 
@@ -115,10 +63,6 @@
     };
 
     const globalInsertElement = async (tool: Tool, innerHtml: string) => {
-        setCaret();
-
-        await tick();
-
         contentHtml = replaceAllRegEx(contentHtml, /<div><br><\/div>$/gim, "");
         contentHtml = replaceAllRegEx(
             contentHtml,
@@ -127,38 +71,14 @@
         );
         contentHtml = replaceAllRegEx(contentHtml, /<br>$/gim, "");
 
-        await tick();
-
         let uID = generateUniqueID(tool);
         innerHtml = innerHtml.replaceAll("${uID}", uID);
         contentHtml = contentHtml + innerHtml;
-        //insertTextAtCaret(innerHtml);
+        insertHtmlAfterSelection(innerHtml);
 
-        contentHtml = contentHtml;
-        //trackLastElement = tool;
+        await tick();
+
         setCaret();
-    };
-
-    const insertNewLine = async () => {
-        //setCaret();
-        //contentText = contentText + `<br>`;
-        //setCaret();
-        // console.log(getSelectionStart());
-        // var innerHtml = "<div id=${uID}>";
-        //let uID = generateUniqueID(Tool.Div);
-        // innerHtml = innerHtml.replaceAll("${uID}", uID);
-        // mainHero.appendChild();
-        // contentHtml = contentHtml + innerHtml;
-
-        //const child = document.createElement("div");
-        //child.setAttribute("id", uID);
-        //child.textContent = "Test";
-        //mainHero.appendChild(child);
-
-        debugger;
-        //await tick();
-        //document.getElementById(uID).focus();
-        insertHtmlAfterSelection("<h1>test</h1>");
     };
 
     function insertHtmlAfterSelection(html) {
@@ -180,6 +100,8 @@
                     lastNode = frag.appendChild(node);
                 }
                 range.insertNode(frag);
+                contentHtml =
+                    range.commonAncestorContainer.parentNode.innerHTML;
             }
         } else if (document.selection && document.selection.createRange) {
             range = document.selection.createRange();
@@ -188,17 +110,13 @@
         }
     }
 
-    function getSelectionStart() {
-        var node = document.getSelection().anchorNode;
-        return node.nodeType == 3 ? node.parentNode : node;
-    }
-
     const setCaret = async () => {
         await tick();
         console.log(contentHtml);
         let range = document.createRange();
         let sel = window.getSelection();
 
+        debugger;
         range.setStartAfter(
             mainHero.childNodes[mainHero.childNodes.length - 1]
         );
@@ -207,80 +125,16 @@
         sel.removeAllRanges();
         sel.addRange(range);
     };
-
-    function insertTextAtCaret(text) {
-        var sel, range;
-        if (window.getSelection) {
-            sel = window.getSelection();
-            if (sel.getRangeAt && sel.rangeCount) {
-                range = sel.getRangeAt(0);
-                range.deleteContents();
-                //range.insertNode(document.createTextNode(text));
-                //range.insertNode(document.createTextNode(text));
-                //range.insertNode(text);
-                //range.insertNode(document.createElement(text));
-                var div = document.createElement("div");
-                console.log(text.trim());
-                div.innerHTML = text.trim();
-                console.log(range);
-                range.insertNode(div);
-
-                //debugger;
-
-                // const newDiv = document.createElement("h1");
-                // const newContent = document.createTextNode(
-                //     "Hi there and greetings!"
-                // );
-                // newDiv.appendChild(newContent);
-
-                // range.insertNode(newDiv);
-            }
-        } else if (document.selection && document.selection.createRange) {
-            document.selection.createRange().text = text;
-        }
-    }
-
-    const onFocus = () => {
-        // if (contentText === "") {
-        //     contentText = contentText + `<div>`;
-        // }
-    };
-
-    function saveSelection() {
-        if (window.getSelection) {
-            sel = window.getSelection();
-            if (sel.getRangeAt && sel.rangeCount) {
-                return sel.getRangeAt(0);
-            }
-        } else if (document.selection && document.selection.createRange) {
-            return document.selection.createRange();
-        }
-        return null;
-    }
-
-    function restoreSelection(range) {
-        if (range) {
-            if (window.getSelection) {
-                sel = window.getSelection();
-                sel.removeAllRanges();
-                sel.addRange(range);
-            } else if (document.selection && range.select) {
-                range.select();
-            }
-        }
-    }
 </script>
 
-<svelte:window on:keydown={handleKeydown} />
+<!-- <svelte:window on:keydown={handleKeydown} /> -->
 
 <div
     bind:this={mainHero}
     bind:innerHTML={contentHtml}
     on:keypress|stopPropagation={onKeyPress}
-    on:focus={onFocus}
     contenteditable="true"
     class="cpd-main"
-    id="testid"
 />
 
 <pre />
