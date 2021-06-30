@@ -12,9 +12,13 @@
 
     interface documentData {
         tag: string;
-        innerText: string;
         component: object;
+        componentProps: object;
+    }
+
+    interface checkboxProps {
         componentId: string;
+        innerText: string;
     }
 
     onMount(() => {
@@ -30,11 +34,15 @@
         console.log(event);
         let eventData = event.detail as ToolBoxEventData;
         if (eventData.selectedTool === Tool.Checkbox) {
+            var checkboxProps: checkboxProps = {
+                componentId: utils.generateUniqueID(Tool.Checkbox),
+                innerText: "Todo",
+            };
+
             insertDocumentData({
                 tag: "checkbox",
-                innerText: "test",
                 component: Checkbox,
-                componentId: utils.generateUniqueID(Tool.Checkbox),
+                componentProps: checkboxProps,
             });
         }
     };
@@ -45,16 +53,14 @@
     }
 
     function recurFunction(node: Node): Node {
-        debugger;
-        let nodeId: string = node.id;
-        if (
-            nodeId === undefined ||
-            nodeId === "" ||
-            !nodeId.includes("comp-cpd-")
-        ) {
-            recurFunction(node.parentNode);
+        let nodeId = node?.id;
+
+        if (nodeId !== undefined && nodeId.includes("comp-cpd-")) {
+            console.log(node.id);
+            return node;
+        } else {
+            return recurFunction(node.parentNode);
         }
-        return node;
     }
 
     const onToolFocus = () => {
@@ -63,7 +69,7 @@
 
     const onKeyPress = (event) => {
         if (event.code === Key.Enter) {
-            event.preventDefault();
+            //event.preventDefault();
             //console.log(getSelectionStart());
             console.log(recurFunction(document.getSelection().anchorNode));
         }
@@ -72,10 +78,7 @@
 
 <div contenteditable="true" on:keypress|stopPropagation={onKeyPress}>
     {#each storage as node}
-        <svelte:component
-            this={node.component}
-            componentId={node.componentId}
-        />
+        <svelte:component this={node.component} props={node.componentProps} />
     {/each}
 </div>
 
