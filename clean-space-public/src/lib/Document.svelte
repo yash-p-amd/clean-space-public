@@ -1,16 +1,13 @@
 <script lang="ts">
     //imports
     import ToolBox from "./ToolBox.svelte";
+    import Checkbox from "./Checkbox.svelte";
     import { tick } from "svelte";
     import { Tool, ToolBoxEventData } from "../statics/ToolBoxEvent";
     import { Key } from "../constants/Key";
     import { onMount } from "svelte";
-    import {
-        generateUniqueID,
-        replaceAllRegEx,
-        rangeManipulation,
-    } from "../utils/utils";
-    import { debug } from "svelte/internal";
+    import { utils, replaceAllRegEx, rangeManipulation } from "../utils/utils";
+    import { afterUpdate, debug } from "svelte/internal";
 
     //svelte constants
     //variables
@@ -31,6 +28,12 @@
 
         contentHtml = contentHtml + `<div>Edit Me!!</div>`;
         //contentHtml = contentHtml + child.innerHTML;
+    });
+
+    afterUpdate(() => {
+        console.log("Updated");
+        //inputNode.value = value;
+        //contentHtml = contentHtml;
     });
 
     const onKeyPress = async (e) => {
@@ -71,6 +74,11 @@
     };
 
     const globalInsertElement = async (tool: Tool, innerHtml: string) => {
+        if (tool === Tool.Checkbox) {
+            //console.log(Checkbox);
+            innerHtml = '<svelte:component this="{Checkbox}" />';
+        }
+
         await tick();
 
         contentHtml = replaceAllRegEx(contentHtml, /<div><br><\/div>$/gim, "");
@@ -81,17 +89,17 @@
         );
         contentHtml = replaceAllRegEx(contentHtml, /<br>$/gim, "");
 
-        let uID = generateUniqueID(tool);
+        let uID = utils.generateUniqueID(tool);
         innerHtml = innerHtml.replaceAll("${uID}", uID);
         contentHtml = contentHtml + innerHtml;
-        var frag = insertHtmlAfterSelection(innerHtml);
+        var frag = await insertHtmlAfterSelection(innerHtml);
 
         if (frag !== null) {
             setCaret(frag, uID);
         }
     };
 
-    async function insertHtmlAfterSelection(html: string): Node {
+    async function insertHtmlAfterSelection(html: string): Promise<Node> {
         var sel, range: Range, node;
         if (window.getSelection) {
             sel = window.getSelection();
@@ -157,10 +165,16 @@
         sel.removeAllRanges();
         sel.addRange(range);
     };
+
+    $: chkbox = false;
+    function togglePOC() {
+        chkbox = chkbox ? false : true;
+        //contentHtml = "test";
+        //contentHtml = '<svelte:component this="{Checkbox}" />';
+    }
 </script>
 
 <!-- <svelte:window on:keydown={handleKeydown} /> -->
-
 <div
     bind:this={mainHero}
     bind:innerHTML={contentHtml}
@@ -168,7 +182,9 @@
     contenteditable="true"
     class="cpd-main"
     id={mainHeroId}
-/>
+>
+    {@html contentHtml}
+</div>
 
 <pre />
 {contentHtml}
@@ -179,6 +195,12 @@
         on:message={onToolBoxEventData}
         on:focus={onToolFocus}
     />
+{/if}
+
+<button on:click={togglePOC}>POC</button>
+
+{#if chkbox}
+    <svelte:component this={Checkbox} />
 {/if}
 
 <style>

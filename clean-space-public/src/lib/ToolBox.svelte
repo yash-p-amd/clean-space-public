@@ -89,14 +89,22 @@
     bind:this={mainHero}
     bind:value
     on:keypress|stopPropagation={onKeyPress}
-    on:click|stopPropagation={dispatchEvent}
+    on:click|stopPropagation={() => {
+        dispatchEvent;
+    }}
     size={tools.length}
 >
     {#each tools as tool}
         <option value={tool}>{tool}</option>
     {/each}
 </select>
-<button on:click={dispatchEvent}> Click to say hello </button>
+<button
+    on:click={() => {
+        dispatchEvent;
+    }}
+>
+    Click to say hello
+</button>
 {value}
 
 <style>

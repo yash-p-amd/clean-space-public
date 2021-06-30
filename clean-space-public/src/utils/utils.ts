@@ -16,7 +16,7 @@ export function getEventsAction(component) {
     };
 }
 
-export function generateUniqueID(toolType: Tool) {
+export function fnGenerateUniqueID(toolType: Tool): string {
     let uID = "";
     let timeStamp = new Date().valueOf();
     if (toolType === Tool.Checkbox) {
@@ -83,4 +83,7 @@ export const rangeManipulation = {
     getIndexOfElementInNodesByElementId: fnGetIndexOfElementInNodesByElementId
 }
 
+export const utils = {
+    generateUniqueID: fnGenerateUniqueID
+}
 

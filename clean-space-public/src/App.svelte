@@ -1,13 +1,17 @@
 <script lang="ts">
   import logo from "./assets/svelte.png";
   import Document from "./lib/Document.svelte";
+  import DocumentNew from "./lib/DocumentNew.svelte";
 </script>
 
 <main>
   <img src={logo} alt="Svelte Logo" />
   <h1>Hello Typescript!</h1>
 
-  <Document />
+  <!-- <Document /> -->
+  <!-- <svelte:component this={Document} /> -->
+
+  <DocumentNew />
 
   <p>
     Visit <a href="https://svelte.dev">svelte.dev</a> to learn how to build Svelte
