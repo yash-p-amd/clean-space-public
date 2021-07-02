@@ -3,11 +3,7 @@
     import { onMount } from "svelte";
     import { debug } from "svelte/internal";
     import { Tool, ToolBoxEventData } from "../statics/ToolBoxEvent";
-
-    interface checkboxProps {
-        componentId: string;
-        innerText: string;
-    }
+    import type { checkboxProps, documentData } from "../utils/interfaces";
 
     export let props: checkboxProps;
 

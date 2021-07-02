@@ -5,21 +5,11 @@
     import { Tool, ToolBoxEventData } from "../statics/ToolBoxEvent";
     import { Key } from "../constants/Key";
     import { utils } from "../utils/utils";
+    import type { checkboxProps, documentData } from "../utils/interfaces";
 
     let toolBox;
     let storageArray: documentData[] = [];
     $: storage = storageArray;
-
-    interface documentData {
-        tag: string;
-        component: object;
-        componentProps: object;
-    }
-
-    interface checkboxProps {
-        componentId: string;
-        innerText: string;
-    }
 
     onMount(() => {
         console.log("Mounted");

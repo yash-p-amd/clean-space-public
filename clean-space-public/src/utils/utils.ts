@@ -78,6 +78,7 @@ const fnGetIndexOfElementInNodesByElementId = (nodes: Node[], elementId: string)
     return index;
 }
 
+
 export const rangeManipulation = {
     extractElementId: fnExtractElementId,
     getIndexOfElementInNodesByElementId: fnGetIndexOfElementInNodesByElementId
@@ -86,4 +87,6 @@ export const rangeManipulation = {
 export const utils = {
     generateUniqueID: fnGenerateUniqueID
 }
+
+
 
