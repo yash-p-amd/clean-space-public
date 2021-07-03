@@ -7,7 +7,7 @@ export interface ComponentProps {
 
 export interface DocumentData {
     tag: string;
-    component: object;
+    component: any;
     componentProps: ComponentProps;
     componentInstance?: ComponentInstance;
 }

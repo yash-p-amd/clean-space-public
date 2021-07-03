@@ -28,7 +28,6 @@
 
     export const exportedOnKeyPress = (event) => {
         if (event.code === Keys.Enter) {
-            debugger;
             event.preventDefault();
         }
     };
