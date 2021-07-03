@@ -4,7 +4,7 @@
     import Checkbox from "./Checkbox.svelte";
     import { tick } from "svelte";
     import { Tool, ToolBoxEventData } from "../statics/ToolBoxEvent";
-    import { Key } from "../constants/Key";
+    import { Keys } from "../constants/Keys";
     import { onMount } from "svelte";
     import { utils, replaceAllRegEx, rangeManipulation } from "../utils/utils";
     import { afterUpdate, debug } from "svelte/internal";
@@ -38,7 +38,7 @@
 
     const onKeyPress = async (e) => {
         //"/"
-        if (e.code === Key.slash && !e.shiftKey) {
+        if (e.code === Keys.slash && !e.shiftKey) {
             toggleToolBox();
             return;
         }

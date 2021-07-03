@@ -2,7 +2,7 @@
     //imports
     import { ToolBoxEventData } from "../statics/ToolBoxEvent";
     import { Tool } from "../statics/ToolBoxEvent";
-    import { Key } from "../constants/Key";
+    import { Keys } from "../constants/Keys";
     import { createEventDispatcher } from "svelte";
     import { onMount } from "svelte";
     import { beforeUpdate } from "svelte";
@@ -25,14 +25,14 @@
     });
 
     const onKeyPress = (e) => {
-        if (e.code === Key.Enter) {
+        if (e.code === Keys.Enter) {
             let eventData = new ToolBoxEventData();
             eventData.selectedTool = value;
             eventData.selectedToolHtml = getHtmlForTool(value);
             dispatchEvent(eventData);
             return;
         }
-        if (e.code === Key.slash && !e.ctrlKey) {
+        if (e.code === Keys.slash && !e.ctrlKey) {
             let eventData = new ToolBoxEventData();
             eventData.selectedTool = Tool.None;
             eventData.selectedToolHtml = getHtmlForTool(value);

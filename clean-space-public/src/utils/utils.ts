@@ -43,9 +43,6 @@ export function fnGenerateUniqueID(toolType: Tool): string {
     if (toolType === Tool.Header6) {
         uID = "cpd-header6-" + timeStamp;
     }
-    if (toolType === Tool.Div) {
-        uID = "cpd-div-" + timeStamp;
-    }
     return uID;
 }
 

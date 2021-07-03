@@ -3,28 +3,26 @@
     import Checkbox from "./Checkbox.svelte";
     import ToolBox from "./ToolBox.svelte";
     import { Tool, ToolBoxEventData } from "../statics/ToolBoxEvent";
-    import { Key } from "../constants/Key";
+    import { Keys } from "../constants/Keys";
     import { utils } from "../utils/utils";
-    import type { checkboxProps, documentData } from "../utils/interfaces";
+    import type { ComponentProps, DocumentData } from "../utils/interfaces";
 
     let toolBox;
-    let storageArray: documentData[] = [];
+    let storageArray: DocumentData[] = [];
     $: storage = storageArray;
 
     onMount(() => {
         console.log("Mounted");
     });
 
-    function insertDocumentData(data: documentData) {
+    function insertDocumentData(data: DocumentData) {
         storageArray = [...storageArray, data];
     }
 
     const onToolBoxEventData = (event) => {
-        console.log("onToolBoxEventData");
-        console.log(event);
         let eventData = event.detail as ToolBoxEventData;
         if (eventData.selectedTool === Tool.Checkbox) {
-            var checkboxProps: checkboxProps = {
+            var checkboxProps: ComponentProps = {
                 componentId: utils.generateUniqueID(Tool.Checkbox),
                 innerText: "Todo",
             };
@@ -58,17 +56,22 @@
     };
 
     const onKeyPress = (event) => {
-        if (event.code === Key.Enter) {
+        if (event.code === Keys.Enter) {
             //event.preventDefault();
             //console.log(getSelectionStart());
             console.log(recurFunction(document.getSelection().anchorNode));
         }
+        storage[0].componentInstance.exportedOnKeyPress(event);
     };
 </script>
 
 <div contenteditable="true" on:keypress|stopPropagation={onKeyPress}>
-    {#each storage as node}
-        <svelte:component this={node.component} props={node.componentProps} />
+    {#each storage as node, index}
+        <svelte:component
+            this={node.component}
+            bind:this={storage[index].componentInstance}
+            props={node.componentProps}
+        />
     {/each}
 </div>
 

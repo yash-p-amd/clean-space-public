@@ -1,32 +1,63 @@
 <script lang="ts">
-    import { utils } from "../utils/utils";
-    import { onMount } from "svelte";
-    import { debug } from "svelte/internal";
-    import { Tool, ToolBoxEventData } from "../statics/ToolBoxEvent";
-    import type { checkboxProps, documentData } from "../utils/interfaces";
+    import { Keys } from "../constants/Keys";
+    import { onMount, tick } from "svelte";
+    import type { ComponentProps } from "../utils/interfaces";
 
-    export let props: checkboxProps;
+    export let props: ComponentProps;
 
     let componentId;
     let elementId;
 
-    let mainHero;
-    let value: string = "Todo";
+    $: labelValue = "Todo";
 
     elementId = props.componentId;
     componentId = `comp-${elementId}`;
 
-    onMount(() => {
-        mainHero.focus();
-    });
+    onMount(() => {});
+
+    const onLabelClick = (event) => {
+        event.preventDefault();
+    };
+
+    const onLabelKeyPress = (event) => {
+        if (event.code === Keys.Enter) {
+            event.preventDefault();
+            console.log(labelValue);
+        }
+    };
+
+    export const exportedOnKeyPress = (event) => {
+        if (event.code === Keys.Enter) {
+            debugger;
+            event.preventDefault();
+        }
+    };
 </script>
 
-<div id={componentId}>
+<div class="comp-main" id={componentId}>
     <input id={elementId} type="checkbox" />
-    <div contenteditable="true" bind:this={mainHero}>
-        <label for={elementId}>{props.innerText}</label>
-    </div>
+    <label for={elementId}>
+        <div
+            contenteditable="true"
+            bind:textContent={labelValue}
+            on:click|stopPropagation={onLabelClick}
+            on:keypress|stopPropagation={onLabelKeyPress}
+            class="comp-label-div"
+        />
+    </label>
 </div>
 
 <style>
+    .comp-main {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        flex-wrap: nowrap;
+        align-content: center;
+    }
+
+    .comp-label-div {
+        min-width: 5px;
+    }
 </style>
