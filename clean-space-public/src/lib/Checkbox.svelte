@@ -2,6 +2,7 @@
     import { Keys } from "../constants/Keys";
     import { onMount, tick } from "svelte";
     import type { ComponentProps } from "../utils/interfaces";
+    import { componentAtCaret } from "../utils/store";
 
     export let props: ComponentProps;
 
@@ -15,32 +16,26 @@
 
     onMount(() => {});
 
-    const onLabelClick = (event) => {
-        event.preventDefault();
-    };
-
-    const onLabelKeyPress = (event) => {
+    export const onKeyPress = (event) => {
         if (event.code === Keys.Enter) {
             event.preventDefault();
-            console.log(labelValue);
+            debugger;
+            componentAtCaret.set(this);
         }
     };
 
-    export const exportedOnKeyPress = (event) => {
-        if (event.code === Keys.Enter) {
-            event.preventDefault();
-        }
+    const onFocus = () => {
+        debugger;
+        componentAtCaret.set(this);
     };
 </script>
 
-<div class="comp-main" id={componentId}>
+<div on:focus={onFocus} class="comp-main" id={componentId}>
     <input id={elementId} type="checkbox" />
     <label for={elementId}>
         <div
             contenteditable="true"
             bind:textContent={labelValue}
-            on:click|stopPropagation={onLabelClick}
-            on:keypress|stopPropagation={onLabelKeyPress}
             class="comp-label-div"
         />
     </label>

@@ -13,11 +13,11 @@ export interface DocumentData {
 }
 
 interface ComponentInstance extends SvelteComponent {
-    exportedOnKeyPress: Function;
+    onKeyPress: Function;
 }
 
-export interface Node {
-    id: string;
+export interface CustomNode extends Node {
+    id?: string;
 }
 
 export interface Keyboard {

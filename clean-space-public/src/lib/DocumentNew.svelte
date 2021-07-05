@@ -5,7 +5,13 @@
     import { Tool, ToolBoxEventData } from "../statics/ToolBoxEvent";
     import { Keys } from "../constants/Keys";
     import { utils } from "../utils/utils";
-    import type { ComponentProps, DocumentData } from "../utils/interfaces";
+    import { componentAtCaret } from "../utils/store";
+    import type {
+        ComponentProps,
+        DocumentData,
+        CustomNode,
+    } from "../utils/interfaces";
+    import { debug, tick } from "svelte/internal";
 
     let toolBox;
     let storageArray: DocumentData[] = [];
@@ -19,7 +25,7 @@
         storageArray = [...storageArray, data];
     }
 
-    const onToolBoxEventData = (event) => {
+    const onToolBoxEventData = async (event) => {
         let eventData = event.detail as ToolBoxEventData;
         if (eventData.selectedTool === Tool.Checkbox) {
             var checkboxProps: ComponentProps = {
@@ -40,10 +46,10 @@
         return node.nodeType == 3 ? node.parentNode : node;
     }
 
-    function recurFunction(node: Node): Node {
+    function recurFunction(node: CustomNode): CustomNode {
         let nodeId = node?.id;
 
-        if (nodeId !== undefined && nodeId.includes("comp-cpd-")) {
+        if (nodeId !== undefined && nodeId.includes("comp-cpd")) {
             console.log(node.id);
             return node;
         } else {
@@ -55,14 +61,28 @@
         console.log("onToolFocus");
     };
 
-    const onKeyPress = (event) => {
+    const onKeyPress = async (event) => {
         if (event.code === Keys.Enter) {
-            //event.preventDefault();
-            //console.log(getSelectionStart());
             console.log(recurFunction(document.getSelection().anchorNode));
+            var stringKey = recurFunction(document.getSelection().anchorNode);
+            var index = GetIndexFromStorage(stringKey.id);
+            console.log(stringKey);
+
+            console.log(index);
+            debugger;
+            console.log($componentAtCaret);
         }
-        storage[0].componentInstance.exportedOnKeyPress(event);
+        storage[0].componentInstance.onKeyPress(event);
     };
+
+    function GetIndexFromStorage(componentId: string): number {
+        storage.forEach((element, index) => {
+            if (element.componentProps.componentId === componentId) {
+                return index;
+            }
+        });
+        return storage.length - 1;
+    }
 </script>
 
 <div contenteditable="true" on:keypress|stopPropagation={onKeyPress}>
