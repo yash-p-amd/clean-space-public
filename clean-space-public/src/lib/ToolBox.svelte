@@ -25,14 +25,14 @@
     });
 
     const onKeyPress = (e) => {
-        if (e.code === Keys.Enter) {
+        if (e.code == Keys.Enter) {
             let eventData = new ToolBoxEventData();
             eventData.selectedTool = value;
             eventData.selectedToolHtml = getHtmlForTool(value);
             dispatchEvent(eventData);
             return;
         }
-        if (e.code === Keys.slash && !e.ctrlKey) {
+        if (e.code == Keys.slash && !e.ctrlKey) {
             let eventData = new ToolBoxEventData();
             eventData.selectedTool = Tool.None;
             eventData.selectedToolHtml = getHtmlForTool(value);
@@ -46,31 +46,31 @@
     };
 
     function getHtmlForTool(tool: Tool): string {
-        if (tool === Tool.Bullet) {
+        if (tool == Tool.Bullet) {
             return "<ul id=${uID}><li>Bullet</li></ul>";
         }
-        if (tool === Tool.Checkbox) {
+        if (tool == Tool.Checkbox) {
             return '<div><input id=${uID} type="checkbox"><label for=${uID}></label></div>';
         }
-        if (tool === Tool.Header1) {
+        if (tool == Tool.Header1) {
             return '<h1 id=${uID} style="color: red">Header1</h1>';
         }
-        if (tool === Tool.Header2) {
+        if (tool == Tool.Header2) {
             return '<h2 id=${uID} style="color: red">Header2</h2>';
         }
-        if (tool === Tool.Header3) {
+        if (tool == Tool.Header3) {
             return '<h3 id=${uID} style="color: red">Header3</h3>';
         }
-        if (tool === Tool.Header4) {
+        if (tool == Tool.Header4) {
             return '<h4 id=${uID} style="color: red">Header4</h4>';
         }
-        if (tool === Tool.Header5) {
+        if (tool == Tool.Header5) {
             return '<h5 id=${uID} style="color: red">Header5</h5>';
         }
-        if (tool === Tool.Header6) {
+        if (tool == Tool.Header6) {
             return '<h6 id=${uID} style="color: red">Header6</h6>';
         }
-        if (tool === Tool.Card) {
+        if (tool == Tool.Card) {
             let stringBuilder = [];
             stringBuilder.push('<article class="forecast">');
             stringBuilder.push("<h1>Heading</h1>");

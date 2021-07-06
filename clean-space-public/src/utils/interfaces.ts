@@ -10,10 +10,12 @@ export interface DocumentData {
     component: any;
     componentProps: ComponentProps;
     componentInstance?: ComponentInstance;
+    componentEvent: any;
 }
 
-interface ComponentInstance extends SvelteComponent {
+export interface ComponentInstance extends SvelteComponent {
     compOnKeyPress: Function;
+    compGetNode: Function;
 }
 
 export interface CustomNode extends Node {
@@ -29,4 +31,23 @@ export interface Keyboard {
     Enter: string;
     Space: string,
     Backspace: string
+}
+
+export interface CheckboxEventData {
+    sourceNode: ComponentInstance;
+    sourceNodeType: Tool;
+    sourceProps: ComponentProps;
+}
+
+export enum Tool {
+    None = "None",
+    Header1 = "Header1",
+    Header2 = "Header2",
+    Header3 = "Header3",
+    Header4 = "Header4",
+    Header5 = "Header5",
+    Header6 = "Header6",
+    Bullet = "Bullet",
+    Checkbox = "Checkbox",
+    Card = "Card",
 }

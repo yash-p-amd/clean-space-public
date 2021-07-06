@@ -10,6 +10,8 @@
         ComponentProps,
         DocumentData,
         CustomNode,
+        CheckboxEventData,
+        ComponentInstance,
     } from "../utils/interfaces";
     import { debug, tick } from "svelte/internal";
 
@@ -27,7 +29,7 @@
 
     const onToolBoxEventData = async (event) => {
         let eventData = event.detail as ToolBoxEventData;
-        if (eventData.selectedTool === Tool.Checkbox) {
+        if (eventData.selectedTool == Tool.Checkbox) {
             var checkboxProps: ComponentProps = {
                 componentId: utils.generateUniqueID(Tool.Checkbox),
                 innerText: "Todo",
@@ -37,47 +39,57 @@
                 tag: "checkbox",
                 component: Checkbox,
                 componentProps: checkboxProps,
+                componentEvent: onCheckboxEventData,
             });
         }
     };
 
-    function getSelectionStart() {
-        var node = document.getSelection().anchorNode;
-        return node.nodeType == 3 ? node.parentNode : node;
-    }
-
-    function recurFunction(node: CustomNode): CustomNode {
+    function searchParentComponent(node: CustomNode): CustomNode {
         let nodeId = node?.id;
-
         if (nodeId !== undefined && nodeId.includes("comp-cpd")) {
-            console.log(node.id);
             return node;
         } else {
-            return recurFunction(node.parentNode);
+            return searchParentComponent(node.parentNode);
         }
     }
 
     const onToolFocus = () => {
-        console.log("onToolFocus");
+        //console.log("onToolFocus");
     };
 
     const onKeyPress = async (event) => {
-        if (event.code === Keys.Enter) {
-            var lastNode = recurFunction(document.getSelection().anchorNode);
-            var index = GetIndexFromStorage(lastNode.id);
+        if (event.code == Keys.Enter) {
+            var lastNode = searchParentComponent(
+                document.getSelection().anchorNode
+            );
 
+            debugger;
+
+            var index = GetIndexOfComponentInStorage(lastNode.id);
             count.set(lastNode);
+
+            debugger;
+            console.log(index);
+            storage[index].componentInstance.compOnKeyPress(event);
+            storage[index].componentInstance.compGetNode();
         }
-        storage[0].componentInstance.compOnKeyPress(event);
     };
 
-    function GetIndexFromStorage(componentId: string): number {
+    const onCheckboxEventData = async (event) => {
+        let eventData = event.detail as CheckboxEventData;
+        console.log("Receiving " + eventData.sourceProps.componentId);
+        //let index = GetIndexFromStorage(eventData.sourceProps.componentId);
+        //console.log(index);
+    };
+
+    function GetIndexOfComponentInStorage(componentId: string): number {
+        let returnIndex = storage.length - 1;
         storage.forEach((element, index) => {
-            if (element.componentProps.componentId === componentId) {
-                return index;
+            if (`comp-${element.componentProps.componentId}` === componentId) {
+                returnIndex = index;
             }
         });
-        return storage.length - 1;
+        return returnIndex;
     }
 </script>
 
@@ -87,6 +99,7 @@
             this={node.component}
             bind:this={storage[index].componentInstance}
             props={node.componentProps}
+            on:message={node.componentEvent}
         />
     {/each}
 </div>
