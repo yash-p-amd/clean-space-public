@@ -5,7 +5,7 @@
     import { Tool, ToolBoxEventData } from "../statics/ToolBoxEvent";
     import { Keys } from "../constants/Keys";
     import { utils } from "../utils/utils";
-    import { componentAtCaret } from "../utils/store";
+    import { count } from "../utils/store";
     import type {
         ComponentProps,
         DocumentData,
@@ -63,16 +63,12 @@
 
     const onKeyPress = async (event) => {
         if (event.code === Keys.Enter) {
-            console.log(recurFunction(document.getSelection().anchorNode));
-            var stringKey = recurFunction(document.getSelection().anchorNode);
-            var index = GetIndexFromStorage(stringKey.id);
-            console.log(stringKey);
+            var lastNode = recurFunction(document.getSelection().anchorNode);
+            var index = GetIndexFromStorage(lastNode.id);
 
-            console.log(index);
-            debugger;
-            console.log($componentAtCaret);
+            count.set(lastNode);
         }
-        storage[0].componentInstance.onKeyPress(event);
+        storage[0].componentInstance.compOnKeyPress(event);
     };
 
     function GetIndexFromStorage(componentId: string): number {

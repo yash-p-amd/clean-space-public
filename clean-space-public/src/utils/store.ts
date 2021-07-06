@@ -1,3 +1,4 @@
 import { writable } from 'svelte/store';
+import type { CustomNode } from "../utils/interfaces";
 
-export const componentAtCaret = writable<Node>(null);
+export const count = writable<CustomNode>(null);

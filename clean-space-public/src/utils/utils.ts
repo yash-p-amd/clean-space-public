@@ -1,5 +1,6 @@
 import { bubble, debug, listen } from "svelte/internal";
 import { Tool } from "../statics/ToolBoxEvent";
+import type { CustomNode } from "./interfaces";
 
 export function getEventsAction(component) {
     return node => {
@@ -65,7 +66,7 @@ const fnGetIndexOfElementInNodesByElementId = (nodes: Node[], elementId: string)
 
     let index = 0;
     nodes.forEach((node, parentIndex) => {
-        node.childNodes.forEach((childNode, index) => {
+        node.childNodes.forEach((childNode: CustomNode, index) => {
             if (childNode.id == elementId) {
                 index = parentIndex;
             }

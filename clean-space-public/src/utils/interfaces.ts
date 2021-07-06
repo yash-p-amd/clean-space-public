@@ -13,7 +13,7 @@ export interface DocumentData {
 }
 
 interface ComponentInstance extends SvelteComponent {
-    onKeyPress: Function;
+    compOnKeyPress: Function;
 }
 
 export interface CustomNode extends Node {
