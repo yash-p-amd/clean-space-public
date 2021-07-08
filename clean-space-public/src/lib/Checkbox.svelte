@@ -1,11 +1,11 @@
 <script lang="ts">
-    import { count } from "../utils/store";
+    import { caretNode } from "../utils/store";
     import { createEventDispatcher } from "svelte";
     import { Keys } from "../constants/Keys";
     import { onMount } from "svelte";
     import type {
         ComponentProps,
-        CheckboxEventData,
+        CheckBoxEventData,
         ComponentInstance,
     } from "../utils/interfaces";
     import { Tool } from "../utils/interfaces";
@@ -14,48 +14,45 @@
 
     $: text = "";
     $: status = false;
-    //$: $count && console.log($count);
     let textNode;
-    let componentNode;
+    export let componentNode;
 
     onMount(() => {
-        //textNode.focus();
+        textNode.focus();
+        console.log(`Mounted : ${props.componentId}`);
     });
 
-    const dispatch = createEventDispatcher();
+    // const dispatch = createEventDispatcher();
 
     const onTextClick = (event) => {};
 
     const onTextFocus = () => {
-        //console.log("I am in focus");
-        //console.log(componentNode);
+        caretNode.set(componentNode);
     };
 
-    const onComponentNodeFocus = () => {
-        console.log("ComponentNode focus");
-    };
-
-    const dispatchEvent = (eventData: CheckboxEventData) => {
-        console.log("Dispatching " + eventData.sourceProps.componentId);
-        dispatch("message", eventData);
-    };
+    // const dispatchEvent = (eventData: CheckBoxEventData) => {
+    //     console.log("Dispatching " + eventData.sourceProps.componentId);
+    //     dispatch("message", eventData);
+    // };
 
     export const compOnKeyPress = (event) => {
-        if (event.code == Keys.Enter) {
-            if (!event.shiftKey) {
-                event.preventDefault();
-                dispatchEvent({
-                    sourceNode: componentNode as ComponentInstance,
-                    sourceNodeType: Tool.Checkbox,
-                    sourceProps: props,
-                });
-            } else {
-                return;
-            }
-        }
+        //debugger;
+        // if (event.code == Keys.Enter) {
+        //     if (!event.shiftKey) {
+        //         event.preventDefault();
+        //         // dispatchEvent({
+        //         //     sourceNode: componentNode as ComponentInstance,
+        //         //     sourceNodeType: Tool.Checkbox,
+        //         //     sourceProps: props,
+        //         // });
+        //     } else {
+        //         return;
+        //     }
+        // }
     };
 
     export const compGetNode = () => {
+        //debugger;
         return componentNode;
     };
 </script>
@@ -65,7 +62,6 @@
     id="comp-{props.componentId}"
     contenteditable="false"
     bind:this={componentNode}
-    on:focus={onComponentNodeFocus}
 >
     <input id={props.componentId} type="checkbox" bind:checked={status} />
     {#if !status}

@@ -1,6 +1,6 @@
 import { bubble, debug, listen } from "svelte/internal";
-import { Tool } from "../statics/ToolBoxEvent";
 import type { CustomNode } from "./interfaces";
+import { Tool } from "../utils/interfaces";
 
 export function getEventsAction(component) {
     return node => {
@@ -17,9 +17,9 @@ export function getEventsAction(component) {
     };
 }
 
-export function fnGenerateUniqueID(toolType: Tool): string {
+export function fnGenerateUniqueID(toolType: Tool, id: string): string {
     let uID = "";
-    let timeStamp = new Date().valueOf();
+    let timeStamp = id;
     if (toolType === Tool.Checkbox) {
         uID = "cpd-checkbox-" + timeStamp;
     }

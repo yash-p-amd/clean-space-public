@@ -6,11 +6,9 @@ export interface ComponentProps {
 }
 
 export interface DocumentData {
-    tag: string;
     component: any;
     componentProps: ComponentProps;
-    componentInstance?: ComponentInstance;
-    componentEvent: any;
+    componentInstance: ComponentInstance;
 }
 
 export interface ComponentInstance extends SvelteComponent {
@@ -33,7 +31,12 @@ export interface Keyboard {
     Backspace: string
 }
 
-export interface CheckboxEventData {
+export interface ToolBoxEventData {
+    selectedTool: Tool;
+    selectedToolHtml: string;
+}
+
+export interface CheckBoxEventData {
     sourceNode: ComponentInstance;
     sourceNodeType: Tool;
     sourceProps: ComponentProps;

@@ -1,241 +1,319 @@
 <script lang="ts">
-    //imports
-    import ToolBox from "./ToolBox.svelte";
-    import Checkbox from "./Checkbox.svelte";
-    import { tick } from "svelte";
-    import { Tool, ToolBoxEventData } from "../statics/ToolBoxEvent";
-    import { Keys } from "../constants/Keys";
     import { onMount } from "svelte";
-    import { utils, replaceAllRegEx, rangeManipulation } from "../utils/utils";
-    import { afterUpdate, debug } from "svelte/internal";
+    import CheckBox from "./CheckBox.svelte";
+    import ToolBox from "./ToolBox.svelte";
+    import { Keys } from "../constants/Keys";
+    import { utils } from "../utils/utils";
+    import { caretNode, lastUniqueId } from "../utils/store";
+    import type {
+        ComponentProps,
+        DocumentData,
+        CustomNode,
+        CheckBoxEventData,
+        ComponentInstance,
+        ToolBoxEventData,
+    } from "../utils/interfaces";
+    import { Tool } from "../utils/interfaces";
+    import { debug, element, tick } from "svelte/internal";
 
-    //svelte constants
-    //variables
-    let mainHero;
     let toolBox;
-    const mainHeroId: string = "cpd-id-main";
-    $: contentHtml = "";
-    $: isToolBoxVisible = false;
+    let storage: DocumentData[] = [];
+    // $: storage, console.log(storage);
 
-    //custom functionality
+    $: $caretNode && console.log($caretNode);
+
     onMount(() => {
-        mainHero.focus();
-        const child = document.createElement("div");
-        //child.setAttribute("id", "Div1");
-        child.textContent = "Edit me!";
-        //mainHero.appendChild(child);
-        //debugger;
-
-        contentHtml = contentHtml + `<div>Edit Me!!</div>`;
-        //contentHtml = contentHtml + child.innerHTML;
+        console.log("Mounted");
     });
 
-    afterUpdate(() => {
-        console.log("Updated");
-        //inputNode.value = value;
-        //contentHtml = contentHtml;
-    });
+    let elements = {};
 
-    const onKeyPress = async (e) => {
-        //"/"
-        if (e.code === Keys.slash && !e.shiftKey) {
-            toggleToolBox();
-            return;
-        }
-        hideToolBox();
+    let currentAdd = "";
+    const handleAdd = (data) => {
+        if (currentAdd === "") return;
+        storage.splice(index, 0, data);
+        storage = storage;
+        currentAdd = "";
     };
 
-    const onToolFocus = () => {};
-
-    const displayToolBox = () => {
-        isToolBoxVisible = true;
-    };
-
-    const hideToolBox = async () => {
-        isToolBoxVisible = false;
-    };
-
-    const toggleToolBox = () => {
-        isToolBoxVisible = isToolBoxVisible ? false : true;
-    };
-
-    const onToolBoxEventData = async (event) => {
-        let eventData = event.detail as ToolBoxEventData;
-        globalInsertElement(eventData.selectedTool, eventData.selectedToolHtml);
-        mainHero.focus();
-        hideToolBox();
-    };
-
-    const insertCheckbox = async () => {
-        globalInsertElement(
-            Tool.Checkbox,
-            '<div><input id=${uID} type="checkbox"><label for=${uID}></label></div>'
+    const handleRemove = (id) => {
+        storage = storage.filter(
+            (item) => item.componentProps.componentId !== id
         );
     };
 
-    const globalInsertElement = async (tool: Tool, innerHtml: string) => {
-        if (tool === Tool.Checkbox) {
-            //console.log(Checkbox);
-            innerHtml = '<svelte:component this="{Checkbox}" />';
-        }
-
-        await tick();
-
-        contentHtml = replaceAllRegEx(contentHtml, /<div><br><\/div>$/gim, "");
-        contentHtml = replaceAllRegEx(
-            contentHtml,
-            /<div>&nbsp;<\/div>$/gim,
-            ""
-        );
-        contentHtml = replaceAllRegEx(contentHtml, /<br>$/gim, "");
-
-        let uID = utils.generateUniqueID(tool);
-        innerHtml = innerHtml.replaceAll("${uID}", uID);
-        contentHtml = contentHtml + innerHtml;
-        var frag = await insertHtmlAfterSelection(innerHtml);
-
-        if (frag !== null) {
-            setCaret(frag, uID);
-        }
-    };
-
-    async function insertHtmlAfterSelection(html: string): Promise<Node> {
-        var sel, range: Range, node;
-        if (window.getSelection) {
-            sel = window.getSelection();
-            if (sel.getRangeAt && sel.rangeCount) {
-                range = window.getSelection().getRangeAt(0);
-                range.collapse(false);
-
-                // Range.createContextualFragment() would be useful here but is
-                // non-standard and not supported in all browsers (IE9, for one)
-                var el = document.createElement("div");
-                el.innerHTML = html;
-                var frag: DocumentFragment = document.createDocumentFragment(),
-                    node,
-                    lastNode;
-                while ((node = el.firstChild)) {
-                    lastNode = frag.appendChild(node);
-                }
-                //range.insertNode(frag);
-
-                var referenceNode: Node;
-                if (range.endContainer.parentNode.id != mainHeroId) {
-                    referenceNode = range.endContainer.parentNode;
-                } else {
-                    referenceNode = range.endContainer;
-                }
-
-                mainHero.insertBefore(frag, referenceNode.nextSibling);
-                contentHtml = mainHero.innerHTML;
-
-                await tick();
-                return frag;
+    $: {
+        let dirty = false;
+        Object.getOwnPropertyNames(elements).forEach((key) => {
+            if (elements[key] === null) {
+                delete elements[key];
+                dirty = true;
             }
-        } else if (document.selection && document.selection.createRange) {
-            range = document.selection.createRange();
-            range.collapse(false);
-            range.pasteHTML(html);
-            return null;
+        });
+        if (dirty) {
+            // force reactivity
+            elements = elements;
         }
     }
 
-    const setCaret = async (frag: Node, uID: string) => {
+    $: {
+        console.log(elements);
+    }
+
+    async function insertDocumentData(data: DocumentData) {
+        storage = [...storage, data];
         await tick();
-        console.log(contentHtml);
-        let range = document.createRange();
-        let sel = window.getSelection();
+        lastUniqueId.update((n) => n + 1);
+    }
 
-        //debugger;
+    async function spliceinsertDocumentData(data: DocumentData, index: number) {
+        await tick();
 
-        var ind = rangeManipulation.getIndexOfElementInNodesByElementId(
-            mainHero.childNodes,
-            uID
-        );
-        console.log(ind);
-        //range.setStartAfter(
-        //mainHero.childNodes[mainHero.childNodes.length - 1]
-        //mainHero.childNodes[0]
-        //);
-        //range.setStart()
-        //range.setStartAfter(frag);
-        //range.setStartBefore(frag);
-        range.collapse(false);
+        console.log(data);
+        //
+        //var start = storage.slice(0, index);
+        //var end = storage.slice(index + 1, storage.length - 1);
 
-        sel.removeAllRanges();
-        sel.addRange(range);
+        //console.log(start);
+        //console.log(end);
+        // storageArray = [
+        //     ...storageArray.slice(0, index),
+        //     data,
+        //     ...storageArray.slice(index + 1, storageArray.length - 1),
+        // ];
+        // console.log(data);
+        // storageArray = [...start, data, ...end];
+        // console.log(storageArray);
+
+        // let tempAr: DocumentData[] = [];
+        // start.forEach((element) => {
+        //     tempAr.push(element);
+        // });
+        // tempAr.push(data);
+        // end.forEach((ele) => {
+        //     tempAr.push(ele);
+        // });
+
+        //
+        //console.log(tempAr);
+        //storage = tempAr;
+        await tick();
+
+        // storage = [
+        //     ...storage.slice(0, index),
+        //     data,
+        //     ...storage.slice(index, storage.length),
+        // ];
+        //storage = storage;
+
+        storage.splice(index, 0, data);
+        storage = storage;
+        lastUniqueId.update((n) => n + 1);
+        //
+
+        await tick();
+    }
+
+    const onToolBoxEventData = (event) => {
+        let eventData = event.detail as ToolBoxEventData;
+        if (eventData.selectedTool == Tool.Checkbox) {
+            insertCheckBox(null, 0);
+        }
     };
 
-    $: chkbox = false;
-    function togglePOC() {
-        chkbox = chkbox ? false : true;
-        //contentHtml = "test";
-        //contentHtml = '<svelte:component this="{Checkbox}" />';
+    function insertCheckBox(node, caretIndex) {
+        console.log(node);
+
+        var checkboxProps: ComponentProps = {
+            componentId: utils.generateUniqueID(
+                Tool.Checkbox,
+                ($lastUniqueId + 1).toString()
+            ),
+            innerText: "Todo",
+        };
+
+        let tempNode: DocumentData = {
+            component: CheckBox,
+            componentProps: checkboxProps,
+            componentInstance: null,
+        };
+
+        //
+        if (node === null) {
+            insertDocumentData(tempNode);
+        } else {
+            spliceinsertDocumentData(tempNode, caretIndex);
+        }
+
+        lastUniqueId.update((n) => n + 1);
+    }
+
+    function searchParentComponent(node: CustomNode): CustomNode {
+        let nodeId = node?.id;
+        if (nodeId !== undefined && nodeId.includes("comp-cpd")) {
+            return node;
+        } else {
+            return searchParentComponent(node.parentNode);
+        }
+    }
+
+    const onToolFocus = () => {
+        //console.log("onToolFocus");
+    };
+
+    const onKeyPress = async (event) => {
+        await tick();
+        if (event.code == Keys.Enter && !event.shiftKey) {
+            event.preventDefault();
+            console.log(storage);
+            let caretIndex = await searchCaretNodeIndex($caretNode);
+            //console.log(`caretNode : ${caretIndex}`);
+            //
+            //storage[caretIndex].componentInstance.compOnKeyPress(event);
+
+            await tick();
+            if (storage[caretIndex].componentInstance !== undefined) {
+                insertCheckBox(
+                    storage[caretIndex].componentInstance.compGetNode(),
+                    caretIndex
+                );
+            }
+
+            //insertAfterNodeInStorage(caretIndex);
+        }
+    };
+
+    function insertAfterNodeInStorage(index: number) {
+        console.log(storage);
+        var checkboxProps: ComponentProps = {
+            componentId: utils.generateUniqueID(
+                Tool.Checkbox,
+                ($lastUniqueId + 1).toString()
+            ),
+            innerText: "Todo",
+        };
+
+        lastUniqueId.update((n) => n + 1);
+
+        let tempNode = {
+            component: CheckBox,
+            componentProps: checkboxProps,
+            componentInstance: null,
+        };
+        storage = [
+            ...storage.slice(0, index),
+            tempNode,
+            ...storage.slice(index + 1),
+        ];
+        console.log(storage);
+        console.log(storage);
+        //
+    }
+
+    async function searchCaretNodeIndex(node: CustomNode): Promise<number> {
+        let returnIndex = 0;
+        await tick();
+
+        storage.forEach((element, index) => {
+            let tempNode: CustomNode = element.componentInstance.compGetNode();
+            if (tempNode === node) {
+                returnIndex = index;
+            }
+        });
+        return returnIndex;
     }
 </script>
 
-<!-- <svelte:window on:keydown={handleKeydown} /> -->
-<div
-    bind:this={mainHero}
-    bind:innerHTML={contentHtml}
-    on:keypress|stopPropagation={onKeyPress}
-    contenteditable="true"
-    class="cpd-main"
-    id={mainHeroId}
->
-    {@html contentHtml}
+<div contenteditable="true" on:keypress|stopPropagation={onKeyPress}>
+    <!-- {#each storage as node, index}
+        <svelte:component
+            this={node.component}
+            bind:this={storage[index].componentInstance}
+            props={node.componentProps}
+        />
+    {/each} -->
+
+    {#each storage as node, index}
+        <svelte:component
+            this={node.component}
+            bind:this={elements[index]}
+            props={node.componentProps}
+        />
+    {/each}
 </div>
 
-<pre />
-{contentHtml}
+<ToolBox
+    bind:this={toolBox}
+    on:message={onToolBoxEventData}
+    on:focus={onToolFocus}
+/>
 
-{#if isToolBoxVisible}
-    <ToolBox
-        bind:this={toolBox}
-        on:message={onToolBoxEventData}
-        on:focus={onToolFocus}
-    />
-{/if}
+<!-- <script>
+	import Item from './Item.svelte';
+	
+	let list = [];
+	let elements = {};
+	let lastId = 0;
+	let currentAdd = '';
+	
+	const handleAdd = (data) => {
+		if (currentAdd === '') return;
+// 		list = [...list, {
+// 			id: lastId++,
+// 			value: currentAdd
+// 		}];
+		
+		list.splice(2, 0, {
+ 			id: lastId++,
+ 			value: currentAdd
+ 		});
+		list = list;
+		currentAdd = '';
+	};
+	
+	const handleRemove = (id) => {
+		list = list.filter(item => item.id !== id);
+	};
+	
+	// remove null values
+	$: {
+		let dirty = false;
+		Object.getOwnPropertyNames(elements).forEach(key => {
+			if (elements[key] === null) {
+				delete elements[key];
+				dirty = true;
+			}
+		});
+		if (dirty) {
+			// force reactivity
+			elements = elements;
+		}
+	}
+	debugger
+	// log changes to elements
+	$: console.log(elements);
+</script>
 
-<button on:click={togglePOC}>POC</button>
+<form on:submit|preventDefault={handleAdd}>
+	<input type="text" bind:value={currentAdd}>
+	<button>
+		Add
+	</button>
+</form>
 
-{#if chkbox}
-    <svelte:component this={Checkbox} />
-{/if}
+<p>
+	{list.length} items in the list.
+</p>
+<p>
+	{Object.keys(elements).length} bound elements.
+</p>
 
+<ul>
+	{#each list as {id, value} (id)}
+		<Item {id} {value} on:click={()=>handleRemove(id)} bind:this={elements[id]} />
+	{/each}
+</ul> 
+https://svelte.dev/repl/4195f5f0ecd3430d810464ec85298a99?version=3.22.3
+-->
 <style>
-    .cpd-main {
-        text-align: left;
-        white-space: pre-line;
-        border: solid;
-        /* background-color: #eee; */
-        /* max-width: 14rem; */
-        margin: 1rem auto;
-        line-height: 1.35;
-    }
-    :global(.forecast) {
-        margin: 0;
-        padding: 0.3rem;
-        background-color: #eee;
-        font: 1rem "Fira Sans", sans-serif;
-    }
-
-    /* :global(.forecast) > h1, */
-    :global(.day-forecast) {
-        margin: 0.5rem;
-        padding: 0.3rem;
-        font-size: 1.2rem;
-    }
-
-    /*Place SVG to right side of a card*/
-    /* :global(.day-forecast) {
-        background: right/contain content-box border-box no-repeat
-            url("../../public/favicon.ico") white;
-    } */
-
-    /* :global(.day-forecast) > h2, */
-    :global(.day-forecast) > p {
-        margin: 0.2rem;
-        font-size: 1rem;
-    }
 </style>

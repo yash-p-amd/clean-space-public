@@ -1,11 +1,11 @@
 <script lang="ts">
     //imports
-    import { ToolBoxEventData } from "../statics/ToolBoxEvent";
-    import { Tool } from "../statics/ToolBoxEvent";
     import { Keys } from "../constants/Keys";
     import { createEventDispatcher } from "svelte";
     import { onMount } from "svelte";
     import { beforeUpdate } from "svelte";
+    import type { ToolBoxEventData } from "../utils/interfaces";
+    import { Tool } from "../utils/interfaces";
 
     //svelte constants
     const dispatch = createEventDispatcher();
@@ -26,17 +26,17 @@
 
     const onKeyPress = (e) => {
         if (e.code == Keys.Enter) {
-            let eventData = new ToolBoxEventData();
-            eventData.selectedTool = value;
-            eventData.selectedToolHtml = getHtmlForTool(value);
-            dispatchEvent(eventData);
+            dispatchEvent({
+                selectedTool: value,
+                selectedToolHtml: getHtmlForTool(value),
+            });
             return;
         }
         if (e.code == Keys.slash && !e.ctrlKey) {
-            let eventData = new ToolBoxEventData();
-            eventData.selectedTool = Tool.None;
-            eventData.selectedToolHtml = getHtmlForTool(value);
-            dispatchEvent(eventData);
+            dispatchEvent({
+                selectedTool: Tool.None,
+                selectedToolHtml: getHtmlForTool(value),
+            });
             return;
         }
     };

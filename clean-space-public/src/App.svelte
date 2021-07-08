@@ -1,7 +1,6 @@
 <script lang="ts">
   import logo from "./assets/svelte.png";
   import Document from "./lib/Document.svelte";
-  import DocumentNew from "./lib/DocumentNew.svelte";
 </script>
 
 <main>
@@ -11,7 +10,7 @@
   <!-- <Document /> -->
   <!-- <svelte:component this={Document} /> -->
 
-  <DocumentNew />
+  <Document />
 
   <p>
     Visit <a href="https://svelte.dev">svelte.dev</a> to learn how to build Svelte
