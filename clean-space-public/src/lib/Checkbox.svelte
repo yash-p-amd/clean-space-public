@@ -19,7 +19,7 @@
     let componentNode;
 
     onMount(() => {
-        //textNode.focus();
+        textNode.focus();
         //console.log(`Mounted : ${props.componentId}`);
     });
 

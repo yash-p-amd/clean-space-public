@@ -27,9 +27,12 @@
 
     let elements = {};
 
-    const handleAdd = (data, index) => {
+    let newlyAddedEleId = "";
+
+    const handleAdd = (data: DocumentData, index) => {
         storage.splice(index, 0, data);
         storage = storage;
+        newlyAddedEleId = data.componentProps.componentId;
     };
 
     const handleRemove = (id) => {
@@ -67,7 +70,10 @@
             // force reactivity
             elements = elements;
         }
-        elements = elements;
+        // if (newlyAddedEleId !== "") {
+        //     elements[newlyAddedEleId].setFocus();
+        //     newlyAddedEleId = "";
+        // }
     }
 
     $: {
