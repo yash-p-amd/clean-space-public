@@ -1,15 +1,15 @@
 <svelte:options accessors={true} />
 
 <script lang="ts">
-    import { caretNode, caretComponentId } from "../utils/store";
+    import { caretComponentId } from "../utils/store";
     import { createEventDispatcher } from "svelte";
     import { Keys } from "../constants/Keys";
     import { onMount } from "svelte";
     import type {
         ComponentProps,
-        CheckBoxEventData,
+        ComponentEventData,
     } from "../utils/interfaces";
-    import { Tool } from "../utils/interfaces";
+    import { ComponentEvent } from "../utils/interfaces";
 
     export let props: ComponentProps;
 
@@ -23,7 +23,7 @@
         //console.log(`Mounted : ${props.componentId}`);
     });
 
-    // const dispatch = createEventDispatcher();
+    const dispatch = createEventDispatcher();
 
     const onTextClick = (event) => {};
 
@@ -33,12 +33,20 @@
         caretComponentId.set(props.componentId);
     };
 
-    // const dispatchEvent = (eventData: CheckBoxEventData) => {
-    //     console.log("Dispatching " + eventData.sourceProps.componentId);
-    //     dispatch("message", eventData);
-    // };
+    const dispatchEvent = (eventData: ComponentEventData) => {
+        console.log(
+            `Dispatching : ${eventData.componentEvent} -> ${eventData.componentId}`
+        );
+        dispatch("message", eventData);
+    };
 
     export const compOnKeyPress = (event) => {
+        if (event.code === Keys.Backspace && text === "") {
+            dispatchEvent({
+                componentEvent: ComponentEvent.Delete,
+                componentId: props.componentId,
+            });
+        }
         //debugger;
         // if (event.code == Keys.Enter) {
         //     if (!event.shiftKey) {
@@ -58,6 +66,10 @@
         //debugger;
         return componentNode;
     };
+
+    export const setFocus = () => {
+        textNode.focus();
+    };
 </script>
 
 <div
@@ -76,17 +88,19 @@
             bind:this={textNode}
             on:click|stopPropagation={onTextClick}
             on:focus={onTextFocus}
+            on:keydown={compOnKeyPress}
         />
     {:else}
         <del>
             <div
                 contenteditable="true"
-                placeholder="To-do"
+                placeholder={props.componentId}
                 bind:textContent={text}
                 class="comp-label-div"
                 bind:this={textNode}
                 on:click|stopPropagation={onTextClick}
                 on:focus={onTextFocus}
+                on:keydown={compOnKeyPress}
             />
         </del>
     {/if}

@@ -4,15 +4,15 @@
     import ToolBox from "./ToolBox.svelte";
     import { Keys } from "../constants/Keys";
     import { utils } from "../utils/utils";
-    import { caretNode, lastUniqueId, caretComponentId } from "../utils/store";
+    import { lastUniqueId, caretComponentId } from "../utils/store";
     import type {
         ComponentProps,
         DocumentData,
         CustomNode,
-        CheckBoxEventData,
         ToolBoxEventData,
+        ComponentEventData,
     } from "../utils/interfaces";
-    import { Tool } from "../utils/interfaces";
+    import { Tool, ComponentEvent } from "../utils/interfaces";
     import { debug, element, tick } from "svelte/internal";
 
     let toolBox;
@@ -33,9 +33,26 @@
     };
 
     const handleRemove = (id) => {
+        let previousId = 0;
+        storage.forEach((element, index) => {
+            if (element.componentProps.componentId === id) {
+                previousId = index - 1;
+                if (previousId < 0) {
+                    previousId = 0;
+                }
+            }
+        });
+
+        let key = storage[previousId].componentProps.componentId;
+
         storage = storage.filter(
             (item) => item.componentProps.componentId !== id
         );
+
+        console.log(storage);
+        console.log(elements);
+
+        elements[key].setFocus();
     };
 
     $: {
@@ -81,7 +98,6 @@
                 index = i + 1;
             }
         });
-        //debugger;
         handleAdd(data, index);
     }
 
@@ -125,22 +141,22 @@
             insertCheckBox($caretComponentId);
         }
     };
+
+    const handleMessage = (event) => {
+        let eventData = event.detail as ComponentEventData;
+        if (eventData.componentEvent === ComponentEvent.Delete) {
+            handleRemove(eventData.componentId);
+        }
+    };
 </script>
 
 <div contenteditable="true" on:keypress|stopPropagation={onKeyPress}>
-    <!-- {#each storage as node, index}
-        <svelte:component
-            this={node.component}
-            bind:this={storage[index].componentInstance}
-            props={node.componentProps}
-        />
-    {/each} -->
-
     {#each storage as { component, componentProps }, index (componentProps.componentId)}
         <svelte:component
             this={component}
             props={componentProps}
             bind:this={elements[componentProps.componentId]}
+            on:message={handleMessage}
         />
     {/each}
 </div>
@@ -158,72 +174,5 @@
     on:focus={onToolFocus}
 />
 
-<!-- <script>
-	import Item from './Item.svelte';
-	
-	let list = [];
-	let elements = {};
-	let lastId = 0;
-	let currentAdd = '';
-	
-	const handleAdd = (data) => {
-		if (currentAdd === '') return;
-// 		list = [...list, {
-// 			id: lastId++,
-// 			value: currentAdd
-// 		}];
-		
-		list.splice(2, 0, {
- 			id: lastId++,
- 			value: currentAdd
- 		});
-		list = list;
-		currentAdd = '';
-	};
-	
-	const handleRemove = (id) => {
-		list = list.filter(item => item.id !== id);
-	};
-	
-	// remove null values
-	$: {
-		let dirty = false;
-		Object.getOwnPropertyNames(elements).forEach(key => {
-			if (elements[key] === null) {
-				delete elements[key];
-				dirty = true;
-			}
-		});
-		if (dirty) {
-			// force reactivity
-			elements = elements;
-		}
-	}
-	debugger
-	// log changes to elements
-	$: console.log(elements);
-</script>
-
-<form on:submit|preventDefault={handleAdd}>
-	<input type="text" bind:value={currentAdd}>
-	<button>
-		Add
-	</button>
-</form>
-
-<p>
-	{list.length} items in the list.
-</p>
-<p>
-	{Object.keys(elements).length} bound elements.
-</p>
-
-<ul>
-	{#each list as {id, value} (id)}
-		<Item {id} {value} on:click={()=>handleRemove(id)} bind:this={elements[id]} />
-	{/each}
-</ul> 
-https://svelte.dev/repl/4195f5f0ecd3430d810464ec85298a99?version=3.22.3
--->
 <style>
 </style>

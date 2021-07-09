@@ -27,8 +27,8 @@ export interface Keyboard {
     arrowRight: string;
     slash: string;
     Enter: string;
-    Space: string,
-    Backspace: string
+    Space: string;
+    Backspace: string;
 }
 
 export interface ToolBoxEventData {
@@ -36,9 +36,13 @@ export interface ToolBoxEventData {
     selectedToolHtml: string;
 }
 
-export interface CheckBoxEventData {
-    sourceNodeType: Tool;
-    sourceProps: ComponentProps;
+export interface ComponentEventData {
+    componentId: string;
+    componentEvent: ComponentEvent;
+}
+
+export enum ComponentEvent {
+    Delete = "Delete"
 }
 
 export enum Tool {
