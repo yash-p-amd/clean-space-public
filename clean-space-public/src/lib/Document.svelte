@@ -4,13 +4,12 @@
     import ToolBox from "./ToolBox.svelte";
     import { Keys } from "../constants/Keys";
     import { utils } from "../utils/utils";
-    import { caretNode, lastUniqueId } from "../utils/store";
+    import { caretNode, lastUniqueId, caretComponentId } from "../utils/store";
     import type {
         ComponentProps,
         DocumentData,
         CustomNode,
         CheckBoxEventData,
-        ComponentInstance,
         ToolBoxEventData,
     } from "../utils/interfaces";
     import { Tool } from "../utils/interfaces";
@@ -20,7 +19,7 @@
     let storage: DocumentData[] = [];
     // $: storage, console.log(storage);
 
-    $: $caretNode && console.log($caretNode);
+    //$: $caretNode && console.log($caretNode);
 
     onMount(() => {
         console.log("Mounted");
@@ -28,12 +27,9 @@
 
     let elements = {};
 
-    let currentAdd = "";
-    const handleAdd = (data) => {
-        if (currentAdd === "") return;
+    const handleAdd = (data, index) => {
         storage.splice(index, 0, data);
         storage = storage;
-        currentAdd = "";
     };
 
     const handleRemove = (id) => {
@@ -54,106 +50,67 @@
             // force reactivity
             elements = elements;
         }
+        elements = elements;
     }
 
     $: {
-        console.log(elements);
+        //console.log(elements);
+        Object.getOwnPropertyNames(elements).forEach((key) => {
+            //console.log(key);
+        });
     }
 
     async function insertDocumentData(data: DocumentData) {
         storage = [...storage, data];
         await tick();
-        lastUniqueId.update((n) => n + 1);
     }
 
-    async function spliceinsertDocumentData(data: DocumentData, index: number) {
-        await tick();
+    function getUniqueIdFromStore(): string {
+        var uId = ($lastUniqueId + 1).toString();
+        lastUniqueId.update((id) => id + 1);
+        return uId;
+    }
 
-        console.log(data);
-        //
-        //var start = storage.slice(0, index);
-        //var end = storage.slice(index + 1, storage.length - 1);
-
-        //console.log(start);
-        //console.log(end);
-        // storageArray = [
-        //     ...storageArray.slice(0, index),
-        //     data,
-        //     ...storageArray.slice(index + 1, storageArray.length - 1),
-        // ];
-        // console.log(data);
-        // storageArray = [...start, data, ...end];
-        // console.log(storageArray);
-
-        // let tempAr: DocumentData[] = [];
-        // start.forEach((element) => {
-        //     tempAr.push(element);
-        // });
-        // tempAr.push(data);
-        // end.forEach((ele) => {
-        //     tempAr.push(ele);
-        // });
-
-        //
-        //console.log(tempAr);
-        //storage = tempAr;
-        await tick();
-
-        // storage = [
-        //     ...storage.slice(0, index),
-        //     data,
-        //     ...storage.slice(index, storage.length),
-        // ];
-        //storage = storage;
-
-        storage.splice(index, 0, data);
-        storage = storage;
-        lastUniqueId.update((n) => n + 1);
-        //
-
-        await tick();
+    async function spliceinsertDocumentData(
+        data: DocumentData,
+        caretComponentId: string
+    ) {
+        let index = storage.length - 1;
+        storage.forEach((ele, i) => {
+            if (ele.componentProps.componentId === caretComponentId) {
+                index = i + 1;
+            }
+        });
+        //debugger;
+        handleAdd(data, index);
     }
 
     const onToolBoxEventData = (event) => {
         let eventData = event.detail as ToolBoxEventData;
         if (eventData.selectedTool == Tool.Checkbox) {
-            insertCheckBox(null, 0);
+            insertCheckBox(null);
         }
     };
 
-    function insertCheckBox(node, caretIndex) {
-        console.log(node);
-
+    function insertCheckBox(caretComponentId) {
         var checkboxProps: ComponentProps = {
             componentId: utils.generateUniqueID(
                 Tool.Checkbox,
-                ($lastUniqueId + 1).toString()
+                getUniqueIdFromStore()
             ),
             innerText: "Todo",
+            index: storage.length,
         };
 
         let tempNode: DocumentData = {
             component: CheckBox,
             componentProps: checkboxProps,
-            componentInstance: null,
         };
 
-        //
-        if (node === null) {
+        if (caretComponentId === null) {
             insertDocumentData(tempNode);
         } else {
-            spliceinsertDocumentData(tempNode, caretIndex);
-        }
-
-        lastUniqueId.update((n) => n + 1);
-    }
-
-    function searchParentComponent(node: CustomNode): CustomNode {
-        let nodeId = node?.id;
-        if (nodeId !== undefined && nodeId.includes("comp-cpd")) {
-            return node;
-        } else {
-            return searchParentComponent(node.parentNode);
+            spliceinsertDocumentData(tempNode, caretComponentId);
         }
     }
 
@@ -162,66 +119,12 @@
     };
 
     const onKeyPress = async (event) => {
-        await tick();
         if (event.code == Keys.Enter && !event.shiftKey) {
             event.preventDefault();
-            console.log(storage);
-            let caretIndex = await searchCaretNodeIndex($caretNode);
-            //console.log(`caretNode : ${caretIndex}`);
-            //
-            //storage[caretIndex].componentInstance.compOnKeyPress(event);
-
-            await tick();
-            if (storage[caretIndex].componentInstance !== undefined) {
-                insertCheckBox(
-                    storage[caretIndex].componentInstance.compGetNode(),
-                    caretIndex
-                );
-            }
-
-            //insertAfterNodeInStorage(caretIndex);
+            //console.log($caretComponentId);
+            insertCheckBox($caretComponentId);
         }
     };
-
-    function insertAfterNodeInStorage(index: number) {
-        console.log(storage);
-        var checkboxProps: ComponentProps = {
-            componentId: utils.generateUniqueID(
-                Tool.Checkbox,
-                ($lastUniqueId + 1).toString()
-            ),
-            innerText: "Todo",
-        };
-
-        lastUniqueId.update((n) => n + 1);
-
-        let tempNode = {
-            component: CheckBox,
-            componentProps: checkboxProps,
-            componentInstance: null,
-        };
-        storage = [
-            ...storage.slice(0, index),
-            tempNode,
-            ...storage.slice(index + 1),
-        ];
-        console.log(storage);
-        console.log(storage);
-        //
-    }
-
-    async function searchCaretNodeIndex(node: CustomNode): Promise<number> {
-        let returnIndex = 0;
-        await tick();
-
-        storage.forEach((element, index) => {
-            let tempNode: CustomNode = element.componentInstance.compGetNode();
-            if (tempNode === node) {
-                returnIndex = index;
-            }
-        });
-        return returnIndex;
-    }
 </script>
 
 <div contenteditable="true" on:keypress|stopPropagation={onKeyPress}>
@@ -233,14 +136,21 @@
         />
     {/each} -->
 
-    {#each storage as node, index}
+    {#each storage as { component, componentProps }, index (componentProps.componentId)}
         <svelte:component
-            this={node.component}
-            bind:this={elements[index]}
-            props={node.componentProps}
+            this={component}
+            props={componentProps}
+            bind:this={elements[componentProps.componentId]}
         />
     {/each}
 </div>
+
+<p>
+    {storage.length} items in the list.
+</p>
+<p>
+    {Object.keys(elements).length} bound elements.
+</p>
 
 <ToolBox
     bind:this={toolBox}

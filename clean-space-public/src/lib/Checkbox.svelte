@@ -1,12 +1,13 @@
+<svelte:options accessors={true} />
+
 <script lang="ts">
-    import { caretNode } from "../utils/store";
+    import { caretNode, caretComponentId } from "../utils/store";
     import { createEventDispatcher } from "svelte";
     import { Keys } from "../constants/Keys";
     import { onMount } from "svelte";
     import type {
         ComponentProps,
         CheckBoxEventData,
-        ComponentInstance,
     } from "../utils/interfaces";
     import { Tool } from "../utils/interfaces";
 
@@ -15,11 +16,11 @@
     $: text = "";
     $: status = false;
     let textNode;
-    export let componentNode;
+    let componentNode;
 
     onMount(() => {
-        textNode.focus();
-        console.log(`Mounted : ${props.componentId}`);
+        //textNode.focus();
+        //console.log(`Mounted : ${props.componentId}`);
     });
 
     // const dispatch = createEventDispatcher();
@@ -27,7 +28,9 @@
     const onTextClick = (event) => {};
 
     const onTextFocus = () => {
-        caretNode.set(componentNode);
+        //caretNode.set(componentNode);
+        //caretIndex.set(props.index);
+        caretComponentId.set(props.componentId);
     };
 
     // const dispatchEvent = (eventData: CheckBoxEventData) => {
@@ -67,7 +70,7 @@
     {#if !status}
         <div
             contenteditable="true"
-            placeholder="To-do"
+            placeholder={props.componentId}
             bind:textContent={text}
             class="comp-label-div"
             bind:this={textNode}

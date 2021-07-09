@@ -3,18 +3,18 @@ import type { SvelteComponent } from 'svelte';
 export interface ComponentProps {
     componentId: string;
     innerText: string;
+    index: number;
 }
 
 export interface DocumentData {
     component: any;
     componentProps: ComponentProps;
-    componentInstance: ComponentInstance;
 }
 
-export interface ComponentInstance extends SvelteComponent {
-    compOnKeyPress: Function;
-    compGetNode: Function;
-}
+// export interface ComponentInstance extends SvelteComponent {
+//     compOnKeyPress: Function;
+//     compGetNode: Function;
+// }
 
 export interface CustomNode extends Node {
     id?: string;
@@ -37,7 +37,6 @@ export interface ToolBoxEventData {
 }
 
 export interface CheckBoxEventData {
-    sourceNode: ComponentInstance;
     sourceNodeType: Tool;
     sourceProps: ComponentProps;
 }
