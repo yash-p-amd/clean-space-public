@@ -1,4 +1,4 @@
-import type { SvelteComponent } from 'svelte';
+import type { Tool, ComponentEvent } from "../utils/enums";
 
 export interface ComponentProps {
     componentId: string;
@@ -11,10 +11,10 @@ export interface DocumentData {
     componentProps: ComponentProps;
 }
 
-// export interface ComponentInstance extends SvelteComponent {
-//     compOnKeyPress: Function;
-//     compGetNode: Function;
-// }
+export interface FocusedComponent {
+    id: string;
+    type: Tool;
+}
 
 export interface CustomNode extends Node {
     id?: string;
@@ -37,23 +37,8 @@ export interface ToolBoxEventData {
 }
 
 export interface ComponentEventData {
-    componentId: string;
-    componentEvent: ComponentEvent;
+    id: string;
+    type: Tool;
+    event: ComponentEvent;
 }
 
-export enum ComponentEvent {
-    Delete = "Delete"
-}
-
-export enum Tool {
-    None = "None",
-    Header1 = "Header1",
-    Header2 = "Header2",
-    Header3 = "Header3",
-    Header4 = "Header4",
-    Header5 = "Header5",
-    Header6 = "Header6",
-    Bullet = "Bullet",
-    Checkbox = "Checkbox",
-    Card = "Card",
-}

@@ -5,7 +5,7 @@
     import { onMount } from "svelte";
     import { beforeUpdate } from "svelte";
     import type { ToolBoxEventData } from "../utils/interfaces";
-    import { Tool } from "../utils/interfaces";
+    import { Tool } from "../utils/enums";
 
     //svelte constants
     const dispatch = createEventDispatcher();

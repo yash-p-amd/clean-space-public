@@ -1,7 +1,7 @@
 <svelte:options accessors={true} />
 
 <script lang="ts">
-    import { caretComponentId } from "../utils/store";
+    import { focusedComponent } from "../utils/store";
     import { createEventDispatcher } from "svelte";
     import { Keys } from "../constants/Keys";
     import { onMount } from "svelte";
@@ -9,62 +9,42 @@
         ComponentProps,
         ComponentEventData,
     } from "../utils/interfaces";
-    import { ComponentEvent } from "../utils/interfaces";
+    import { ComponentEvent, Tool } from "../utils/enums";
 
     export let props: ComponentProps;
 
     $: text = "";
     $: status = false;
     let textNode;
-    let componentNode;
+
+    const dispatch = createEventDispatcher();
 
     onMount(() => {
         textNode.focus();
-        //console.log(`Mounted : ${props.componentId}`);
     });
-
-    const dispatch = createEventDispatcher();
 
     const onTextClick = (event) => {};
 
     const onTextFocus = () => {
-        //caretNode.set(componentNode);
-        //caretIndex.set(props.index);
-        caretComponentId.set(props.componentId);
+        focusedComponent.set({
+            id: props.componentId,
+            type: Tool.Checkbox,
+        });
     };
 
     const dispatchEvent = (eventData: ComponentEventData) => {
-        console.log(
-            `Dispatching : ${eventData.componentEvent} -> ${eventData.componentId}`
-        );
+        console.log(`Dispatching : ${eventData.event} -> ${eventData.id}`);
         dispatch("message", eventData);
     };
 
     export const compOnKeyPress = (event) => {
         if (event.code === Keys.Backspace && text === "") {
             dispatchEvent({
-                componentEvent: ComponentEvent.Delete,
-                componentId: props.componentId,
+                type: Tool.Checkbox,
+                event: ComponentEvent.Delete,
+                id: props.componentId,
             });
         }
-        //debugger;
-        // if (event.code == Keys.Enter) {
-        //     if (!event.shiftKey) {
-        //         event.preventDefault();
-        //         // dispatchEvent({
-        //         //     sourceNode: componentNode as ComponentInstance,
-        //         //     sourceNodeType: Tool.Checkbox,
-        //         //     sourceProps: props,
-        //         // });
-        //     } else {
-        //         return;
-        //     }
-        // }
-    };
-
-    export const compGetNode = () => {
-        //debugger;
-        return componentNode;
     };
 
     export const setFocus = () => {
@@ -72,12 +52,7 @@
     };
 </script>
 
-<div
-    class="comp-main"
-    id="comp-{props.componentId}"
-    contenteditable="false"
-    bind:this={componentNode}
->
+<div class="comp-main" id="comp-{props.componentId}" contenteditable="false">
     <input id={props.componentId} type="checkbox" bind:checked={status} />
     {#if !status}
         <div

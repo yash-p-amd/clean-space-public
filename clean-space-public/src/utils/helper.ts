@@ -1,89 +1,40 @@
-import { bubble, debug, listen } from "svelte/internal";
-import type { CustomNode } from "./interfaces";
-import { Tool } from "./interfaces"
+import { Tool } from "./enums";
+import { IdCounter } from "../utils/store";
+import { get } from 'svelte/store';
 
-export function getEventsAction(component) {
-    return node => {
-        const events = Object.keys(component.$$.callbacks);
-        const listeners = [];
-        events.forEach(event =>
-            listeners.push(listen(node, event, e => bubble(component, e)))
-        );
-        return {
-            destroy: () => {
-                listeners.forEach(listener => listener());
-            }
-        };
-    };
-}
-
-export function fnGenerateUniqueID(toolType: Tool, id: string): string {
-    let uID = "";
-    let timeStamp = id;
+export function fnGenerateNewId(toolType: Tool): string {
+    let counter = get(IdCounter) + 1;
+    let id: string = "";
     if (toolType === Tool.Checkbox) {
-        uID = "cpd-checkbox-" + timeStamp;
+        id = "cpd-checkbox-" + counter;
     }
     if (toolType === Tool.Bullet) {
-        uID = "cpd-bullet-" + timeStamp;
+        id = "cpd-bullet-" + counter;
     }
     if (toolType === Tool.Header1) {
-        uID = "cpd-header1-" + timeStamp;
+        id = "cpd-header1-" + counter;
     }
     if (toolType === Tool.Header2) {
-        uID = "cpd-header2-" + timeStamp;
+        id = "cpd-header2-" + counter;
     }
     if (toolType === Tool.Header3) {
-        uID = "cpd-header3-" + timeStamp;
+        id = "cpd-header3-" + counter;
     }
     if (toolType === Tool.Header4) {
-        uID = "cpd-header4-" + timeStamp;
+        id = "cpd-header4-" + counter;
     }
     if (toolType === Tool.Header5) {
-        uID = "cpd-header5-" + timeStamp;
+        id = "cpd-header5-" + counter;
     }
     if (toolType === Tool.Header6) {
-        uID = "cpd-header6-" + timeStamp;
+        id = "cpd-header6-" + counter;
     }
-    return uID;
+    IdCounter.set(counter);
+    return id;
 }
 
-export function replaceAllRegEx(input: string, regex: RegExp, replace: string): string {
-    let matches;
-    if ((matches = regex.exec(input)) !== null) {
-        matches.forEach((match, groupIndex) => {
-            input = input.replaceAll(regex, replace);
-        });
-    }
-    return input;
-}
-
-const fnExtractElementId = (node: Node): string => {
-    console.log(node);
-    return "";
-}
-
-const fnGetIndexOfElementInNodesByElementId = (nodes: Node[], elementId: string): number => {
-
-    let index = 0;
-    nodes.forEach((node, parentIndex) => {
-        node.childNodes.forEach((childNode: CustomNode, index) => {
-            if (childNode.id == elementId) {
-                index = parentIndex;
-            }
-        });
-    });
-
-    return index;
-}
-
-
-export const rangeManipulation = {
-    extractElementId: fnExtractElementId,
-    getIndexOfElementInNodesByElementId: fnGetIndexOfElementInNodesByElementId
-}
-
-export const utils = {
-    generateUniqueID: fnGenerateUniqueID
+export const util = {
+    generateNewId: fnGenerateNewId
 }
 
 

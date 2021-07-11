@@ -3,36 +3,28 @@
     import CheckBox from "./CheckBox.svelte";
     import ToolBox from "./ToolBox.svelte";
     import { Keys } from "../constants/Keys";
-    import { utils } from "../utils/helper";
-    import { lastUniqueId, caretComponentId } from "../utils/store";
+    import { util } from "../utils/helper";
     import type {
         ComponentProps,
         DocumentData,
-        CustomNode,
         ToolBoxEventData,
         ComponentEventData,
     } from "../utils/interfaces";
-    import { Tool, ComponentEvent } from "../utils/interfaces";
-    import { debug, element, tick } from "svelte/internal";
+    import { Tool, ComponentEvent } from "../utils/enums";
+    import { tick } from "svelte/internal";
+    import { focusedComponent } from "../utils/store";
 
     let toolBox;
     let storage: DocumentData[] = [];
+
     // $: storage, console.log(storage);
-
-    //$: $caretNode && console.log($caretNode);
-
-    onMount(() => {
-        console.log("Mounted");
-    });
+    // $: $caretNode && console.log($caretNode);
 
     let elements = {};
-
-    let newlyAddedEleId = "";
 
     const handleAdd = (data: DocumentData, index) => {
         storage.splice(index, 0, data);
         storage = storage;
-        newlyAddedEleId = data.componentProps.componentId;
     };
 
     const handleRemove = (id) => {
@@ -52,9 +44,6 @@
             (item) => item.componentProps.componentId !== id
         );
 
-        console.log(storage);
-        console.log(elements);
-
         elements[key].setFocus();
     };
 
@@ -67,17 +56,11 @@
             }
         });
         if (dirty) {
-            // force reactivity
             elements = elements;
         }
-        // if (newlyAddedEleId !== "") {
-        //     elements[newlyAddedEleId].setFocus();
-        //     newlyAddedEleId = "";
-        // }
     }
 
     $: {
-        //console.log(elements);
         Object.getOwnPropertyNames(elements).forEach((key) => {
             //console.log(key);
         });
@@ -86,12 +69,6 @@
     async function insertDocumentData(data: DocumentData) {
         storage = [...storage, data];
         await tick();
-    }
-
-    function getUniqueIdFromStore(): string {
-        var uId = ($lastUniqueId + 1).toString();
-        lastUniqueId.update((id) => id + 1);
-        return uId;
     }
 
     async function spliceinsertDocumentData(
@@ -116,10 +93,7 @@
 
     function insertCheckBox(caretComponentId) {
         var checkboxProps: ComponentProps = {
-            componentId: utils.generateUniqueID(
-                Tool.Checkbox,
-                getUniqueIdFromStore()
-            ),
+            componentId: util.generateNewId(Tool.Checkbox),
             innerText: "Todo",
             index: storage.length,
         };
@@ -142,16 +116,17 @@
 
     const onKeyPress = async (event) => {
         if (event.code == Keys.Enter && !event.shiftKey) {
-            event.preventDefault();
-            //console.log($caretComponentId);
-            insertCheckBox($caretComponentId);
+            if ($focusedComponent !== null) {
+                event.preventDefault();
+                insertCheckBox($focusedComponent.id);
+            }
         }
     };
 
     const handleMessage = (event) => {
         let eventData = event.detail as ComponentEventData;
-        if (eventData.componentEvent === ComponentEvent.Delete) {
-            handleRemove(eventData.componentId);
+        if (eventData.event === ComponentEvent.Delete) {
+            handleRemove(eventData.id);
         }
     };
 </script>
@@ -166,13 +141,6 @@
         />
     {/each}
 </div>
-
-<p>
-    {storage.length} items in the list.
-</p>
-<p>
-    {Object.keys(elements).length} bound elements.
-</p>
 
 <ToolBox
     bind:this={toolBox}
