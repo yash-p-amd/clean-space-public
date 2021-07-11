@@ -1,6 +1,6 @@
 import { bubble, debug, listen } from "svelte/internal";
 import type { CustomNode } from "./interfaces";
-import { Tool } from "../utils/interfaces";
+import { Tool } from "./interfaces"
 
 export function getEventsAction(component) {
     return node => {

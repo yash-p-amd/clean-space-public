@@ -3,7 +3,7 @@
     import CheckBox from "./CheckBox.svelte";
     import ToolBox from "./ToolBox.svelte";
     import { Keys } from "../constants/Keys";
-    import { utils } from "../utils/utils";
+    import { utils } from "../utils/helper";
     import { lastUniqueId, caretComponentId } from "../utils/store";
     import type {
         ComponentProps,
