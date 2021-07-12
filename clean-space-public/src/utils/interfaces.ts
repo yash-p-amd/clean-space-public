@@ -1,7 +1,7 @@
 import type { Tool, ComponentEvent } from "../utils/enums";
 
 export interface ComponentProps {
-    componentId: string;
+    id: string;
     innerText: string;
     index: number;
 }
@@ -16,8 +16,9 @@ export interface FocusedComponent {
     type: Tool;
 }
 
-export interface CustomNode extends Node {
-    id?: string;
+export interface ComponentPosition {
+    insertAfterCaret: string;
+    insertAtLast: string;
 }
 
 export interface Keyboard {

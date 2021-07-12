@@ -14,3 +14,23 @@ export enum Tool {
     Checkbox = "Checkbox",
     Card = "Card",
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+export enum ComponentPosition {
+    InsertAtLast = "InsertAtLast",
+    InsertAfterCaret = "InsertAfterCaret"
+}

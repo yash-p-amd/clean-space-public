@@ -1,15 +1,15 @@
 <svelte:options accessors={true} />
 
 <script lang="ts">
-    import { focusedComponent } from "../utils/store";
+    import { focusedComponent } from "../../utils/store";
     import { createEventDispatcher } from "svelte";
-    import { Keys } from "../constants/Keys";
+    import { Keys } from "../../constants/Keys";
     import { onMount } from "svelte";
     import type {
         ComponentProps,
         ComponentEventData,
-    } from "../utils/interfaces";
-    import { ComponentEvent, Tool } from "../utils/enums";
+    } from "../../utils/interfaces";
+    import { ComponentEvent, Tool } from "../../utils/enums";
 
     export let props: ComponentProps;
 
@@ -27,7 +27,7 @@
 
     const onTextFocus = () => {
         focusedComponent.set({
-            id: props.componentId,
+            id: props.id,
             type: Tool.Checkbox,
         });
     };
@@ -42,7 +42,7 @@
             dispatchEvent({
                 type: Tool.Checkbox,
                 event: ComponentEvent.Delete,
-                id: props.componentId,
+                id: props.id,
             });
         }
     };
@@ -52,12 +52,12 @@
     };
 </script>
 
-<div class="comp-main" id="comp-{props.componentId}" contenteditable="false">
-    <input id={props.componentId} type="checkbox" bind:checked={status} />
+<div class="comp-main" id="comp-{props.id}" contenteditable="false">
+    <input id={props.id} type="checkbox" bind:checked={status} />
     {#if !status}
         <div
             contenteditable="true"
-            placeholder={props.componentId}
+            placeholder={props.id}
             bind:textContent={text}
             class="comp-label-div"
             bind:this={textNode}
@@ -69,7 +69,7 @@
         <del>
             <div
                 contenteditable="true"
-                placeholder={props.componentId}
+                placeholder={props.id}
                 bind:textContent={text}
                 class="comp-label-div"
                 bind:this={textNode}
