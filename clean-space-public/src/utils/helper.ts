@@ -29,6 +29,9 @@ export function fnGenerateNewId(toolType: Tool): string {
     if (toolType === Tool.Header6) {
         id = "cpd-header6-" + counter;
     }
+    if (toolType === Tool.Text) {
+        id = "cpd-text-" + counter;
+    }
     IdCounter.set(counter);
     return id;
 }

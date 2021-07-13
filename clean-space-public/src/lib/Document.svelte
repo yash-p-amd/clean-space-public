@@ -2,6 +2,7 @@
     import { onMount } from "svelte";
     import CheckBox from "./components/CheckBox.svelte";
     import ToolBox from "./ToolBox.svelte";
+    import Text from "./components/Text.svelte";
     import { Keys } from "../constants/Keys";
     import { util } from "../utils/helper";
     import type {
@@ -57,13 +58,17 @@
 
     const onKeyPress = async (event) => {
         if (event.code == Keys.Enter && !event.shiftKey) {
+            event.preventDefault();
             if ($focusedComponent?.type === Tool.Checkbox) {
                 insertComponent(
                     ComponentPosition.InsertAfterCaret,
                     Tool.Checkbox
                 );
+                return;
             }
-            event.preventDefault();
+
+            insertComponent(ComponentPosition.InsertAfterCaret, Tool.Text);
+            return;
         }
     };
 
@@ -129,7 +134,16 @@
                 },
             };
         }
-
+        if (tool == Tool.Text) {
+            return {
+                component: Text,
+                componentProps: {
+                    id: util.generateNewId(tool),
+                    innerText: "Text",
+                    index: storage.length,
+                },
+            };
+        }
         return null;
     }
 </script>

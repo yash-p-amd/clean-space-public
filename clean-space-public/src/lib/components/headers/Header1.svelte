@@ -1,4 +1,4 @@
-<svelte:options accessors={true} />
+<svelte:options immutable={true} />
 
 <script lang="ts">
     import { focusedComponent } from "../../../utils/store";
@@ -54,7 +54,7 @@
             contenteditable="true"
             placeholder={props.id}
             bind:textContent={text}
-            class="comp-text-div"
+            class="comp-header-div"
             bind:this={textNode}
             on:focus={onTextFocus}
             on:keydown={compOnKeyPress}
@@ -71,12 +71,12 @@
         flex-wrap: nowrap;
         align-content: center;
     }
-    .comp-text-div[placeholder]:empty:before {
+    .comp-header-div[placeholder]:empty:before {
         content: attr(placeholder);
         color: #555;
     }
 
-    .comp-text-div[placeholder]:empty:focus:before {
+    .comp-header-div[placeholder]:empty:focus:before {
         content: "";
     }
 </style>

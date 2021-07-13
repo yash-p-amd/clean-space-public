@@ -13,6 +13,7 @@ export enum Tool {
     Bullet = "Bullet",
     Checkbox = "Checkbox",
     Card = "Card",
+    Text = "Text",
 }
 
 
