@@ -34,18 +34,29 @@
     };
 
     export const compOnKeyPress = (event) => {
-        if (event.code === Keys.Backspace && text === "") {
-            dispatchEvent({
-                type: Tool.Checkbox,
-                event: ComponentEvent.Delete,
-                id: props.id,
-            });
+        if (event.code == Keys.Enter && !event.shiftKey) {
+            event.preventDefault();
+            releaseEvent(ComponentEvent.InsertAfterCaret);
+            return;
         }
+        if (event.code === Keys.Backspace && text === "") {
+            releaseEvent(ComponentEvent.Delete);
+            return;
+        }
+        return;
     };
 
     export const setFocus = () => {
         textNode.focus();
     };
+
+    function releaseEvent(event: ComponentEvent) {
+        dispatchEvent({
+            type: Tool.Header1,
+            event: event,
+            id: props.id,
+        });
+    }
 </script>
 
 <div class="comp-main" id="comp-{props.id}" contenteditable="false">

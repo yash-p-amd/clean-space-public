@@ -57,19 +57,22 @@
     };
 
     const onKeyPress = async (event) => {
-        if (event.code == Keys.Enter && !event.shiftKey) {
-            event.preventDefault();
-            if ($focusedComponent?.type === Tool.Checkbox) {
-                insertComponent(
-                    ComponentPosition.InsertAfterCaret,
-                    Tool.Checkbox
-                );
-                return;
-            }
-
-            insertComponent(ComponentPosition.InsertAfterCaret, Tool.Text);
-            return;
-        }
+        // if (event.code == Keys.Enter && !event.shiftKey) {
+        //     event.preventDefault();
+        //     if ($focusedComponent?.type === Tool.Checkbox) {
+        //         insertComponent(
+        //             ComponentPosition.InsertAfterCaret,
+        //             Tool.Checkbox
+        //         );
+        //         return;
+        //     }
+        //     insertComponent(ComponentPosition.InsertAfterCaret, Tool.Text);
+        //     return;
+        // }
+        // event.preventDefault();
+        // console.log($focusedComponent);
+        // console.log(elements[$focusedComponent.id]);
+        //elements[$focusedComponent.id].compOnKeyPress(event);
     };
 
     const removeComponent = (id) => {
@@ -89,8 +92,25 @@
 
     const handleMessage = (event) => {
         let eventData = event.detail as ComponentEventData;
+
+        if (eventData.type === Tool.Checkbox) {
+            if (eventData.event === ComponentEvent.InsertAfterCaret) {
+                insertComponent(
+                    ComponentPosition.InsertAfterCaret,
+                    Tool.Checkbox
+                );
+                return;
+            }
+        }
+
+        if (eventData.event === ComponentEvent.InsertAfterCaret) {
+            insertComponent(ComponentPosition.InsertAfterCaret, Tool.Text);
+            return;
+        }
+
         if (eventData.event === ComponentEvent.Delete) {
             removeComponent(eventData.id);
+            return;
         }
     };
 

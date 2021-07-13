@@ -1,5 +1,6 @@
 export enum ComponentEvent {
-    Delete = "Delete"
+    Delete = "Delete",
+    InsertAfterCaret = "InsertAfterCaret",
 }
 
 export enum Tool {
