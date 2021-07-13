@@ -84,12 +84,13 @@
         flex-wrap: nowrap;
         align-content: center;
     }
-
+    .comp-text-div {
+        min-width: 50px;
+    }
     .comp-text-div[placeholder]:empty:before {
         content: attr(placeholder);
         color: #555;
     }
-
     .comp-text-div[placeholder]:empty:focus:before {
         content: "";
     }

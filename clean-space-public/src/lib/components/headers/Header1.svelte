@@ -86,7 +86,6 @@
         content: attr(placeholder);
         color: #555;
     }
-
     .comp-header-div[placeholder]:empty:focus:before {
         content: "";
     }
