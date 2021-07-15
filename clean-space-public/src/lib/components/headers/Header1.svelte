@@ -1,62 +1,45 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-    import { focusedComponent } from "../../../utils/store";
     import { createEventDispatcher, onMount } from "svelte";
     import type {
         ComponentProps,
-        ComponentEventData,
+        AfterOnMount,
     } from "../../../utils/interfaces";
-    import { Keys } from "../../../constants/Keys";
-    import { ComponentEvent, Tool } from "../../../utils/enums";
+    import {
+        setFocusOnNode,
+        updateFocusNodeInStore,
+        addRemoveComponentAtCaret,
+    } from "../../../utils/shared";
 
     export let props: ComponentProps;
 
     $: text = "";
-    let textNode;
+    $: isEmpty = text === "" ? true : false;
 
-    const dispatch = createEventDispatcher();
+    let afterOnMount: AfterOnMount = {
+        mainNode: null,
+        eventDispatcher: createEventDispatcher(),
+        preventBackspace: false,
+    };
 
     onMount(() => {
-        textNode.focus();
+        props.afterMount = afterOnMount;
+        setFocusOnNode({ props: props });
     });
 
-    const onTextFocus = () => {
-        focusedComponent.set({
-            id: props.id,
-            type: Tool.Header1,
-        });
-    };
+    const onTextClick = (event) => {};
 
-    const dispatchEvent = (eventData: ComponentEventData) => {
-        console.log(`Dispatching : ${eventData.event} -> ${eventData.id}`);
-        dispatch("message", eventData);
-    };
+    const onTextFocus = () => updateFocusNodeInStore({ props: props });
 
-    export const compOnKeyPress = (event) => {
-        if (event.code == Keys.Enter && !event.shiftKey) {
-            event.preventDefault();
-            releaseEvent(ComponentEvent.InsertAfterCaret);
-            return;
-        }
-        if (event.code === Keys.Backspace && text === "") {
-            releaseEvent(ComponentEvent.Delete);
-            return;
-        }
-        return;
-    };
-
-    export const setFocus = () => {
-        textNode.focus();
-    };
-
-    function releaseEvent(event: ComponentEvent) {
-        dispatchEvent({
-            type: Tool.Header1,
+    const onTextKeydown = (event) =>
+        addRemoveComponentAtCaret({
+            props: props,
             event: event,
-            id: props.id,
+            isEmpty: isEmpty,
         });
-    }
+
+    export const setFocus = () => setFocusOnNode({ props: props });
 </script>
 
 <div class="comp-main" id="comp-{props.id}" contenteditable="false">
@@ -66,9 +49,9 @@
             placeholder={props.id}
             bind:textContent={text}
             class="comp-header-div"
-            bind:this={textNode}
+            bind:this={afterOnMount.mainNode}
             on:focus={onTextFocus}
-            on:keydown={compOnKeyPress}
+            on:keydown={onTextKeydown}
         />
     </h1>
 </div>

@@ -1,11 +1,10 @@
 <script lang="ts">
     //imports
-    import { Keys } from "../constants/Keys";
     import { createEventDispatcher } from "svelte";
     import { onMount } from "svelte";
     import { beforeUpdate } from "svelte";
     import type { ToolBoxEventData } from "../utils/interfaces";
-    import { Tool } from "../utils/enums";
+    import { Tool, Key } from "../utils/enums";
 
     //svelte constants
     const dispatch = createEventDispatcher();
@@ -25,14 +24,14 @@
     });
 
     const onKeyPress = (e) => {
-        if (e.code == Keys.Enter) {
+        if (e.code == Key.Enter) {
             dispatchEvent({
                 selectedTool: value,
                 selectedToolHtml: getHtmlForTool(value),
             });
             return;
         }
-        if (e.code == Keys.slash && !e.ctrlKey) {
+        if (e.code == Key.Slash && !e.ctrlKey) {
             dispatchEvent({
                 selectedTool: Tool.None,
                 selectedToolHtml: getHtmlForTool(value),

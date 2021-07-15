@@ -17,20 +17,16 @@ export enum Tool {
     Text = "Text",
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+export enum Key {
+    ArrowUp = "ArrowUp",
+    ArrowDown = "ArrowDown",
+    ArrowLeft = "ArrowLeft",
+    ArrowRight = "ArrowRight",
+    Slash = "Slash",
+    Enter = "Enter",
+    Space = "Space",
+    Backspace = "Backspace"
+}
 
 export enum ComponentPosition {
     InsertAtLast = "InsertAtLast",

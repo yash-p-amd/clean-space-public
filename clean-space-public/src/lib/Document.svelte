@@ -3,7 +3,6 @@
     import CheckBox from "./components/CheckBox.svelte";
     import ToolBox from "./ToolBox.svelte";
     import Text from "./components/Text.svelte";
-    import { Keys } from "../constants/Keys";
     import { util } from "../utils/helper";
     import type {
         ComponentProps,
@@ -11,7 +10,12 @@
         ToolBoxEventData,
         ComponentEventData,
     } from "../utils/interfaces";
-    import { Tool, ComponentEvent, ComponentPosition } from "../utils/enums";
+    import {
+        Tool,
+        ComponentEvent,
+        ComponentPosition,
+        Key,
+    } from "../utils/enums";
     import { tick } from "svelte/internal";
     import { focusedComponent } from "../utils/store";
     import Header1 from "./components/headers/Header1.svelte";
@@ -139,8 +143,8 @@
                 component: CheckBox,
                 componentProps: {
                     id: util.generateNewId(tool),
-                    innerText: "Todo",
                     index: storage.length,
+                    type: tool,
                 },
             };
         }
@@ -149,8 +153,8 @@
                 component: Header1,
                 componentProps: {
                     id: util.generateNewId(tool),
-                    innerText: "Header1",
                     index: storage.length,
+                    type: tool,
                 },
             };
         }
@@ -159,8 +163,8 @@
                 component: Text,
                 componentProps: {
                     id: util.generateNewId(tool),
-                    innerText: "Text",
                     index: storage.length,
+                    type: tool,
                 },
             };
         }

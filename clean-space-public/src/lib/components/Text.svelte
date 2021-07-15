@@ -1,65 +1,47 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-    import { focusedComponent } from "../../utils/store";
     import { createEventDispatcher } from "svelte";
-    import { Keys } from "../../constants/Keys";
     import { onMount } from "svelte";
-    import type {
-        ComponentProps,
-        ComponentEventData,
-    } from "../../utils/interfaces";
-    import { ComponentEvent, Tool } from "../../utils/enums";
+    import type { ComponentProps, AfterOnMount } from "../../utils/interfaces";
+    import {
+        setFocusOnNode,
+        updateFocusNodeInStore,
+        addRemoveComponentAtCaret,
+        SetCaretPosition,
+    } from "../../utils/shared";
 
     export let props: ComponentProps;
 
     $: text = "";
-    let textNode;
+    $: isEmpty = text === "" ? true : false;
 
-    const dispatch = createEventDispatcher();
+    let afterOnMount: AfterOnMount = {
+        mainNode: null,
+        eventDispatcher: createEventDispatcher(),
+        preventBackspace: false,
+    };
 
     onMount(() => {
-        textNode.focus();
+        props.afterMount = afterOnMount;
+        setFocusOnNode({ props: props });
     });
 
     const onTextClick = (event) => {};
 
-    const onTextFocus = () => {
-        focusedComponent.set({
-            id: props.id,
-            type: Tool.Text,
+    const onTextFocus = () => updateFocusNodeInStore({ props: props });
+
+    const onTextKeydown = (event) =>
+        addRemoveComponentAtCaret({
+            props: props,
+            event: event,
+            isEmpty: isEmpty,
         });
-    };
-
-    const dispatchEvent = (eventData: ComponentEventData) => {
-        console.log(`Dispatching : ${eventData.event} -> ${eventData.id}`);
-        dispatch("message", eventData);
-    };
-
-    export const compOnKeyPress = (event) => {
-        if (event.code == Keys.Enter && !event.shiftKey) {
-            event.preventDefault();
-            releaseEvent(ComponentEvent.InsertAfterCaret);
-            return;
-        }
-        if (event.code === Keys.Backspace && text === "") {
-            releaseEvent(ComponentEvent.Delete);
-            return;
-        }
-        return;
-    };
 
     export const setFocus = () => {
-        textNode.focus();
+        setFocusOnNode({ props: props });
+        SetCaretPosition(props.afterMount.mainNode, text.length);
     };
-
-    function releaseEvent(event: ComponentEvent) {
-        dispatchEvent({
-            type: Tool.Text,
-            event: event,
-            id: props.id,
-        });
-    }
 </script>
 
 <div class="comp-main" id="comp-{props.id}" contenteditable="false">
@@ -68,10 +50,10 @@
         placeholder={props.id}
         bind:textContent={text}
         class="comp-text-div"
-        bind:this={textNode}
+        bind:this={afterOnMount.mainNode}
         on:click|stopPropagation={onTextClick}
         on:focus|stopPropagation={onTextFocus}
-        on:keydown|stopPropagation={compOnKeyPress}
+        on:keydown|stopPropagation={onTextKeydown}
     />
 </div>
 
