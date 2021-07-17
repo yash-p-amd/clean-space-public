@@ -17,12 +17,15 @@
 
     $: text = "";
     $: isEmpty = text === "" ? true : false;
+    $: isSelected = false;
     $: status = false;
 
-    let afterOnMount: AfterOnMount = {
+    let afterOnMount: AfterOnMount;
+    $: afterOnMount = {
         mainNode: null,
         eventDispatcher: createEventDispatcher(),
         preventBackspace: false,
+        isSelected: false,
     };
 
     onMount(() => {
@@ -47,9 +50,19 @@
         setCaretPosition(props.afterMount.mainNode, text.length);
         setFocusOnNode({ props: props });
     };
+
+    export const selectComponenet = (value: boolean) => {
+        if (props.afterMount === undefined) return;
+        isSelected = value;
+        props.afterMount.isSelected = value;
+    };
 </script>
 
-<div class="comp-main" id="comp-{props.id}" contenteditable="false">
+<div
+    class="comp-main {isSelected ? 'select' : ''}"
+    id="comp-{props.id}"
+    contenteditable="false"
+>
     <input id={props.id} type="checkbox" bind:checked={status} />
     {#if !status}
         <div
@@ -102,6 +115,10 @@
         align-items: center;
         flex-wrap: nowrap;
         align-content: center;
+    }
+
+    .select {
+        background: aliceblue;
     }
 
     .comp-label-div[placeholder]:empty:before {

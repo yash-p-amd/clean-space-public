@@ -15,12 +15,14 @@
     export let props: ComponentProps;
 
     $: text = "";
+    $: isSelected = false;
     $: isEmpty = text === "" ? true : false;
 
     let afterOnMount: AfterOnMount = {
         mainNode: null,
         eventDispatcher: createEventDispatcher(),
         preventBackspace: false,
+        isSelected: false,
     };
 
     onMount(() => {
@@ -45,9 +47,19 @@
         setFocusOnNode({ props: props });
         setCaretPosition(props.afterMount.mainNode, text.length);
     };
+
+    export const selectComponenet = (value: boolean) => {
+        if (props.afterMount === undefined) return;
+        isSelected = value;
+        props.afterMount.isSelected = value;
+    };
 </script>
 
-<div class="comp-main" id="comp-{props.id}" contenteditable="false">
+<div
+    class="comp-main {isSelected ? 'select' : ''}"
+    id="comp-{props.id}"
+    contenteditable="false"
+>
     <div
         contenteditable="true"
         placeholder={props.id}
@@ -76,6 +88,9 @@
         align-items: center;
         flex-wrap: nowrap;
         align-content: center;
+    }
+    .select {
+        background: aliceblue;
     }
     .comp-text-div {
         min-width: 50px;

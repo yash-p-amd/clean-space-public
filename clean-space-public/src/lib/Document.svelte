@@ -17,7 +17,7 @@
         Key,
     } from "../utils/enums";
     import { tick } from "svelte/internal";
-    import { focusedComponent } from "../utils/store";
+    import { focusedComponent, isChassisEvent } from "../utils/store";
     import Header1 from "./components/headers/Header1.svelte";
 
     let toolBox;
@@ -87,7 +87,7 @@
         //elements[$focusedComponent.id].compOnKeyPress(event);
     };
 
-    const removeComponent = (id) => {
+    const removeComponentById = async (id) => {
         let previousId = 0;
         storage.forEach((element, index) => {
             if (element.componentProps.id === id) {
@@ -98,9 +98,24 @@
             }
         });
         let key = storage[previousId].componentProps.id;
-        storage = storage.filter((item) => item.componentProps.id !== id);
-        elements[key].setFocus();
+        //storage = storage.filter((item) => item.componentProps.id !== id);
+        storage = storage.filter(
+            (item) => !item.componentProps.afterMount.isSelected
+        );
+        await tick();
+        updateSelectFlagForAllComps(false, false);
+        if (elements[key] !== undefined) {
+            elements[key].setFocus();
+        }
     };
+
+    // const removeComponent = async () => {
+    //     storage = storage.filter(
+    //         (item) => !item.componentProps.afterMount.isSelected
+    //     );
+    //     await tick();
+    //     updateSelectFlagForAllComps(false);
+    // };
 
     const handleMessage = (event) => {
         let eventData = event.detail as ComponentEventData;
@@ -121,19 +136,25 @@
         }
 
         if (eventData.event === ComponentEvent.Delete) {
-            removeComponent(eventData.id);
+            removeComponentById(eventData.id);
             return;
         }
 
         if (eventData.event === ComponentEvent.SelectAll) {
-            //debugger;
-            //eventData.eventRef.preventDefault();
-            //debugger;
-            eventData.eventRef.stopPropagation();
-            eventData.eventRef.stopImmediatePropagation();
+            //eventData.eventRef.stopPropagation();
+            //eventData.eventRef.stopImmediatePropagation();
+            eventData.eventRef.preventDefault();
+            updateSelectFlagForAllComps(true, true);
             return;
         }
     };
+
+    function updateSelectFlagForAllComps(value: boolean, isCEvent: boolean) {
+        Object.getOwnPropertyNames(elements).forEach((key) => {
+            elements[key]?.selectComponenet(value);
+        });
+        isChassisEvent.set(isCEvent);
+    }
 
     function insertComponent(position: ComponentPosition, tool: Tool) {
         let data = componentDataFactory(tool);

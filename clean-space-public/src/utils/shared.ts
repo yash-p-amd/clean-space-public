@@ -1,6 +1,8 @@
 import { ComponentEvent, Key, Tool, KeyboardEvent } from "./enums";
-import { focusedComponent } from "../utils/store";
+import { focusedComponent, isChassisEvent } from "../utils/store";
 import type { ComponentEventData, ComponentProps } from "./interfaces";
+import { compute_rest_props } from "svelte/internal";
+import { get } from 'svelte/store';
 
 
 function foo(model: { property1: number; property2: number }) {
@@ -47,14 +49,28 @@ export const onKeyboardEvent = (model: { props: ComponentProps, event: any, keyb
                 event: ComponentEvent.InsertAfterCaret,
                 eventRef: model.event
             });
-            return;
         }
 
         //Backspace
-        if (model.event.code === Key.Backspace && model.isEmpty) {
-            model.event.preventDefault();
-            triggerEvent({ props: model.props, event: ComponentEvent.Delete, eventRef: model.event });
-            return;
+        // if (model.event.code === Key.Backspace && model.isEmpty) {
+        //     model.event.preventDefault();
+        //     model.props.afterMount.isSelected = true;
+        //     triggerEvent({ props: model.props, event: ComponentEvent.Delete, eventRef: model.event });
+        // }
+
+        if (model.event.code === Key.Backspace) {
+            console.log(get(isChassisEvent));
+            if (get(isChassisEvent) === true) {
+                model.event.preventDefault();
+                triggerEvent({ props: model.props, event: ComponentEvent.Delete, eventRef: model.event });
+                isChassisEvent.set(false);
+            }
+
+            if (model.isEmpty) {
+                model.event.preventDefault();
+                model.props.afterMount.isSelected = true;
+                triggerEvent({ props: model.props, event: ComponentEvent.Delete, eventRef: model.event });
+            }
         }
 
         //Ctrl + A
@@ -63,18 +79,17 @@ export const onKeyboardEvent = (model: { props: ComponentProps, event: any, keyb
             triggerEvent({ props: model.props, event: ComponentEvent.SelectAll, eventRef: model.event });
         }
 
-        return;
     } else if (model.keyboardEvent === KeyboardEvent.OnKeyUp) {
         //console.log("OnKeyUp");
-        return;
+
     } else if (model.keyboardEvent === KeyboardEvent.OnKeyPress) {
         //console.log("OnKeyPress");
-        return;
+
     } else {
-        return;
+
     }
 
-
+    return;
 }
 
 export const setCaretPosition = (el, pos) => {

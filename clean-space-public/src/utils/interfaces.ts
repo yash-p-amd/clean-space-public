@@ -1,5 +1,6 @@
 import type { Tool, ComponentEvent } from "../utils/enums";
 
+
 export interface DocumentData {
     component: any;
     componentProps: ComponentProps;
@@ -16,6 +17,7 @@ export interface AfterOnMount {
     mainNode: any;
     eventDispatcher: any;
     preventBackspace: boolean;
+    isSelected: boolean;
 }
 
 export interface FocusedComponent {
