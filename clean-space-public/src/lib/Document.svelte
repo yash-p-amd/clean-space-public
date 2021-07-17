@@ -97,14 +97,14 @@
                 }
             }
         });
-        let key = storage[previousId].componentProps.id;
+        let key = isChassisEvent ? "" : storage[previousId].componentProps.id;
         //storage = storage.filter((item) => item.componentProps.id !== id);
         storage = storage.filter(
             (item) => !item.componentProps.afterMount.isSelected
         );
         await tick();
         updateSelectFlagForAllComps(false, false);
-        if (elements[key] !== undefined) {
+        if (key !== "" && elements[key] !== undefined) {
             elements[key].setFocus();
         }
     };

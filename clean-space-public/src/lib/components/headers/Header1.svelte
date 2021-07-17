@@ -96,4 +96,8 @@
     .comp-header-div[placeholder]:empty:focus:before {
         content: "";
     }
+
+    [contenteditable] {
+        outline: 0px solid transparent;
+    }
 </style>

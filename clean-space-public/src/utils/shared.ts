@@ -59,7 +59,6 @@ export const onKeyboardEvent = (model: { props: ComponentProps, event: any, keyb
         // }
 
         if (model.event.code === Key.Backspace) {
-            console.log(get(isChassisEvent));
             if (get(isChassisEvent) === true) {
                 model.event.preventDefault();
                 triggerEvent({ props: model.props, event: ComponentEvent.Delete, eventRef: model.event });
