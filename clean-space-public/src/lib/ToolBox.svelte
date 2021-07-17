@@ -87,8 +87,8 @@
 <select
     bind:this={mainHero}
     bind:value
-    on:keypress|stopPropagation={onKeyPress}
-    on:click|stopPropagation={() => {
+    on:keypress={onKeyPress}
+    on:click={() => {
         dispatchEvent;
     }}
     size={tools.length}

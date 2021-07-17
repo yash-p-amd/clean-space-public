@@ -1,4 +1,4 @@
-import { ComponentEvent, Key, Tool } from "./enums";
+import { ComponentEvent, Key, Tool, KeyboardEvent } from "./enums";
 import { focusedComponent } from "../utils/store";
 import type { ComponentEventData, ComponentProps } from "./interfaces";
 
@@ -23,37 +23,61 @@ export const updateFocusNodeInStore = (model: { props: ComponentProps }) => {
     });
 }
 
-export const triggerEvent = (model: { props: ComponentProps, event: ComponentEvent }) => {
+export const triggerEvent = (model: { props: ComponentProps, event: ComponentEvent, eventRef: any }) => {
 
     let eData: ComponentEventData = {
         event: model.event,
         id: model.props.id,
         type: model.props.type,
+        eventRef: model.eventRef,
     }
 
     console.log(`Dispatching : ${eData.event} -> ${eData.id}`);
     model.props.afterMount.eventDispatcher("message", eData);
 };
 
-export const addRemoveComponentAtCaret = (model: { props: ComponentProps, event: any, isEmpty: boolean }) => {
-    if (model.event.code == Key.Enter && !model.event.shiftKey) {
-        model.event.preventDefault();
-        triggerEvent({
-            props: model.props,
-            event: ComponentEvent.InsertAfterCaret,
-        });
+export const onKeyboardEvent = (model: { props: ComponentProps, event: any, keyboardEvent: KeyboardEvent, isEmpty: boolean }) => {
+    if (model.keyboardEvent === KeyboardEvent.OnKeyDown) {
+
+        // Enter
+        if (model.event.code === Key.Enter && !model.event.shiftKey) {
+            model.event.preventDefault();
+            triggerEvent({
+                props: model.props,
+                event: ComponentEvent.InsertAfterCaret,
+                eventRef: model.event
+            });
+            return;
+        }
+
+        //Backspace
+        if (model.event.code === Key.Backspace && model.isEmpty) {
+            model.event.preventDefault();
+            triggerEvent({ props: model.props, event: ComponentEvent.Delete, eventRef: model.event });
+            return;
+        }
+
+        //Ctrl + A
+        if (model.event.code === Key.A && model.event.ctrlKey) {
+            //console.log("Select All");
+            triggerEvent({ props: model.props, event: ComponentEvent.SelectAll, eventRef: model.event });
+        }
+
+        return;
+    } else if (model.keyboardEvent === KeyboardEvent.OnKeyUp) {
+        //console.log("OnKeyUp");
+        return;
+    } else if (model.keyboardEvent === KeyboardEvent.OnKeyPress) {
+        //console.log("OnKeyPress");
+        return;
+    } else {
         return;
     }
-    if (model.event.code === Key.Backspace && model.isEmpty) {
-        model.event.preventDefault();
-        triggerEvent({ props: model.props, event: ComponentEvent.Delete });
-        return;
-    }
-    return;
+
+
 }
 
-
-export const SetCaretPosition = (el, pos) => {
+export const setCaretPosition = (el, pos) => {
     const selection = window.getSelection();
     const range = document.createRange();
     selection.removeAllRanges();

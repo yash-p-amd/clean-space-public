@@ -1,6 +1,13 @@
 export enum ComponentEvent {
     Delete = "Delete",
     InsertAfterCaret = "InsertAfterCaret",
+    SelectAll = "SelectAll",
+}
+
+export enum KeyboardEvent {
+    OnKeyDown = "OnKeyDown",
+    OnKeyUp = "OnKeyUp",
+    OnKeyPress = "OnKeyPress"
 }
 
 export enum Tool {
@@ -25,7 +32,8 @@ export enum Key {
     Slash = "Slash",
     Enter = "Enter",
     Space = "Space",
-    Backspace = "Backspace"
+    Backspace = "Backspace",
+    A = "KeyA",
 }
 
 export enum ComponentPosition {

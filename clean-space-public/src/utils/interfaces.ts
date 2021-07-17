@@ -32,5 +32,6 @@ export interface ComponentEventData {
     id: string;
     type: Tool;
     event: ComponentEvent;
+    eventRef: any;
 }
 

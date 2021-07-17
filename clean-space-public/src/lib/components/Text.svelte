@@ -7,9 +7,10 @@
     import {
         setFocusOnNode,
         updateFocusNodeInStore,
-        addRemoveComponentAtCaret,
-        SetCaretPosition,
+        setCaretPosition,
+        onKeyboardEvent,
     } from "../../utils/shared";
+    import { KeyboardEvent } from "../../utils/enums";
 
     export let props: ComponentProps;
 
@@ -27,20 +28,22 @@
         setFocusOnNode({ props: props });
     });
 
+    const attachKeyboardEvent = (event: any, eventType: KeyboardEvent) => {
+        onKeyboardEvent({
+            props: props,
+            event: event,
+            keyboardEvent: eventType,
+            isEmpty: isEmpty,
+        });
+    };
+
     const onTextClick = (event) => {};
 
     const onTextFocus = () => updateFocusNodeInStore({ props: props });
 
-    const onTextKeydown = (event) =>
-        addRemoveComponentAtCaret({
-            props: props,
-            event: event,
-            isEmpty: isEmpty,
-        });
-
     export const setFocus = () => {
         setFocusOnNode({ props: props });
-        SetCaretPosition(props.afterMount.mainNode, text.length);
+        setCaretPosition(props.afterMount.mainNode, text.length);
     };
 </script>
 
@@ -51,9 +54,17 @@
         bind:textContent={text}
         class="comp-text-div"
         bind:this={afterOnMount.mainNode}
-        on:click|stopPropagation={onTextClick}
-        on:focus|stopPropagation={onTextFocus}
-        on:keydown|stopPropagation={onTextKeydown}
+        on:click={onTextClick}
+        on:focus={onTextFocus}
+        on:keydown={(event) => {
+            attachKeyboardEvent(event, KeyboardEvent.OnKeyDown);
+        }}
+        on:keypress={(event) => {
+            attachKeyboardEvent(event, KeyboardEvent.OnKeyPress);
+        }}
+        on:keyup={(event) => {
+            attachKeyboardEvent(event, KeyboardEvent.OnKeyUp);
+        }}
     />
 </div>
 

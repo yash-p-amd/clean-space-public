@@ -29,7 +29,7 @@
     let elements = {};
 
     $: {
-        console.log($focusedComponent?.id);
+        //console.log($focusedComponent?.id);
     }
 
     $: {
@@ -60,7 +60,15 @@
         //console.log("onToolFocus");
     };
 
-    const onKeyPress = async (event) => {
+    const onKeydown = (event) => {
+        //console.log(event);
+    };
+
+    const onKeyup = (event) => {
+        //console.log(event);
+    };
+
+    const onKeyPress = (event) => {
         // if (event.code == Keys.Enter && !event.shiftKey) {
         //     event.preventDefault();
         //     if ($focusedComponent?.type === Tool.Checkbox) {
@@ -114,6 +122,15 @@
 
         if (eventData.event === ComponentEvent.Delete) {
             removeComponent(eventData.id);
+            return;
+        }
+
+        if (eventData.event === ComponentEvent.SelectAll) {
+            //debugger;
+            //eventData.eventRef.preventDefault();
+            //debugger;
+            eventData.eventRef.stopPropagation();
+            eventData.eventRef.stopImmediatePropagation();
             return;
         }
     };
@@ -172,7 +189,12 @@
     }
 </script>
 
-<div contenteditable="true" on:keypress|stopPropagation={onKeyPress}>
+<div
+    contenteditable="true"
+    on:keypress={onKeyPress}
+    on:keydown={onKeydown}
+    on:keyup={onKeyup}
+>
     {#each storage as { component, componentProps }, index (componentProps.id)}
         <svelte:component
             this={component}

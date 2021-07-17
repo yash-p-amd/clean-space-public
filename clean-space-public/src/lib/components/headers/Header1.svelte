@@ -7,10 +7,11 @@
         AfterOnMount,
     } from "../../../utils/interfaces";
     import {
+        onKeyboardEvent,
         setFocusOnNode,
         updateFocusNodeInStore,
-        addRemoveComponentAtCaret,
     } from "../../../utils/shared";
+    import { KeyboardEvent } from "../../../utils/enums";
 
     export let props: ComponentProps;
 
@@ -28,16 +29,16 @@
         setFocusOnNode({ props: props });
     });
 
-    const onTextClick = (event) => {};
-
     const onTextFocus = () => updateFocusNodeInStore({ props: props });
 
-    const onTextKeydown = (event) =>
-        addRemoveComponentAtCaret({
+    const attachKeyboardEvent = (event: any, eventType: KeyboardEvent) => {
+        onKeyboardEvent({
             props: props,
             event: event,
+            keyboardEvent: eventType,
             isEmpty: isEmpty,
         });
+    };
 
     export const setFocus = () => setFocusOnNode({ props: props });
 </script>
@@ -51,7 +52,15 @@
             class="comp-header-div"
             bind:this={afterOnMount.mainNode}
             on:focus={onTextFocus}
-            on:keydown={onTextKeydown}
+            on:keydown={(event) => {
+                attachKeyboardEvent(event, KeyboardEvent.OnKeyDown);
+            }}
+            on:keypress={(event) => {
+                attachKeyboardEvent(event, KeyboardEvent.OnKeyPress);
+            }}
+            on:keyup={(event) => {
+                attachKeyboardEvent(event, KeyboardEvent.OnKeyUp);
+            }}
         />
     </h1>
 </div>
