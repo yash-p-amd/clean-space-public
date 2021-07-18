@@ -1,5 +1,5 @@
-import { ComponentEvent, Key, Tool, KeyboardEvent } from "./enums";
-import { focusedComponent, isChassisEvent } from "../utils/store";
+import { ComponentEvent, Key, Tool, KeyboardEvent, ComponentPosition } from "./enums";
+import { focusedComponent } from "../utils/store";
 import type { ComponentEventData, ComponentProps } from "./interfaces";
 import { compute_rest_props } from "svelte/internal";
 import { get } from 'svelte/store';
@@ -32,6 +32,7 @@ export const triggerEvent = (model: { props: ComponentProps, event: ComponentEve
         id: model.props.id,
         type: model.props.type,
         eventRef: model.eventRef,
+        props: model.props,
     }
 
     console.log(`Dispatching : ${eData.event} -> ${eData.id}`);
@@ -46,8 +47,8 @@ export const onKeyboardEvent = (model: { props: ComponentProps, event: any, keyb
             model.event.preventDefault();
             triggerEvent({
                 props: model.props,
-                event: ComponentEvent.InsertAfterCaret,
-                eventRef: model.event
+                event: ComponentEvent.Select,
+                eventRef: model.event,
             });
         }
 
@@ -59,12 +60,6 @@ export const onKeyboardEvent = (model: { props: ComponentProps, event: any, keyb
         // }
 
         if (model.event.code === Key.Backspace) {
-            if (get(isChassisEvent) === true) {
-                model.event.preventDefault();
-                triggerEvent({ props: model.props, event: ComponentEvent.Delete, eventRef: model.event });
-                isChassisEvent.set(false);
-            }
-
             if (model.isEmpty) {
                 model.event.preventDefault();
                 model.props.afterMount.isSelected = true;
@@ -74,7 +69,7 @@ export const onKeyboardEvent = (model: { props: ComponentProps, event: any, keyb
 
         //Ctrl + A
         if (model.event.code === Key.A && model.event.ctrlKey) {
-            //console.log("Select All");
+            model.event.preventDefault();
             triggerEvent({ props: model.props, event: ComponentEvent.SelectAll, eventRef: model.event });
         }
 

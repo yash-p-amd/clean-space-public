@@ -1,7 +1,14 @@
 export enum ComponentEvent {
-    Delete = "Delete",
-    InsertAfterCaret = "InsertAfterCaret",
     SelectAll = "SelectAll",
+    Select = "Select",
+    Copy = "Copy",
+    CopyAll = "CopyAll",
+    Paste = "Paste",
+    PasteAll = "PasteAll",
+    Cut = "Cut",
+    CutAll = "CutAll",
+    Delete = "Delete",
+    DeleteAll = "DeleteAll",
 }
 
 export enum KeyboardEvent {
@@ -37,6 +44,7 @@ export enum Key {
 }
 
 export enum ComponentPosition {
+    InsertAfterCaret = "InsertAfterCaret",
+    InsertAtCaret = "InsertAtCaret",
     InsertAtLast = "InsertAtLast",
-    InsertAfterCaret = "InsertAfterCaret"
 }

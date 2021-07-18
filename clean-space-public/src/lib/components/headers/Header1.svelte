@@ -11,7 +11,7 @@
         setFocusOnNode,
         updateFocusNodeInStore,
     } from "../../../utils/shared";
-    import { KeyboardEvent } from "../../../utils/enums";
+    import { ComponentPosition, KeyboardEvent } from "../../../utils/enums";
 
     export let props: ComponentProps;
 
@@ -24,6 +24,7 @@
         eventDispatcher: createEventDispatcher(),
         preventBackspace: false,
         isSelected: false,
+        insertPositionPreference: ComponentPosition.InsertAfterCaret,
     };
 
     onMount(() => {

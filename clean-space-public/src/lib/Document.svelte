@@ -17,7 +17,7 @@
         Key,
     } from "../utils/enums";
     import { tick } from "svelte/internal";
-    import { focusedComponent, isChassisEvent } from "../utils/store";
+    import { focusedComponent } from "../utils/store";
     import Header1 from "./components/headers/Header1.svelte";
 
     let toolBox;
@@ -87,25 +87,24 @@
         //elements[$focusedComponent.id].compOnKeyPress(event);
     };
 
-    const removeComponentById = async (id) => {
-        let previousId = 0;
-        storage.forEach((element, index) => {
-            if (element.componentProps.id === id) {
-                previousId = index - 1;
-                if (previousId < 0) {
-                    previousId = 0;
-                }
+    const removeComponent = (removeEvent: ComponentEvent) => {
+        if (removeEvent === ComponentEvent.Delete) {
+            let firstResult = storage.find(
+                (ele) => ele.componentProps.afterMount.isSelected
+            );
+            let firstResultId = firstResult.componentProps.id;
+            storage = storage.filter(
+                (comp) => !comp.componentProps.afterMount.isSelected
+            );
+            if (elements[firstResultId] !== undefined) {
+                elements[firstResultId].setFocus();
             }
-        });
-        let key = isChassisEvent ? "" : storage[previousId].componentProps.id;
-        //storage = storage.filter((item) => item.componentProps.id !== id);
-        storage = storage.filter(
-            (item) => !item.componentProps.afterMount.isSelected
-        );
-        await tick();
-        updateSelectFlagForAllComps(false, false);
-        if (key !== "" && elements[key] !== undefined) {
-            elements[key].setFocus();
+            return;
+        }
+        if (removeEvent === ComponentEvent.DeleteAll) {
+            storage = storage.filter(
+                (comp) => !comp.componentProps.afterMount.isSelected
+            );
         }
     };
 
@@ -120,40 +119,29 @@
     const handleMessage = (event) => {
         let eventData = event.detail as ComponentEventData;
 
-        if (eventData.type === Tool.Checkbox) {
-            if (eventData.event === ComponentEvent.InsertAfterCaret) {
-                insertComponent(
-                    ComponentPosition.InsertAfterCaret,
-                    Tool.Checkbox
-                );
-                return;
-            }
-        }
-
-        if (eventData.event === ComponentEvent.InsertAfterCaret) {
-            insertComponent(ComponentPosition.InsertAfterCaret, Tool.Text);
-            return;
-        }
-
-        if (eventData.event === ComponentEvent.Delete) {
-            removeComponentById(eventData.id);
+        if (
+            eventData.event === ComponentEvent.Delete ||
+            eventData.event === ComponentEvent.DeleteAll
+        ) {
+            removeComponent(eventData.event);
             return;
         }
 
         if (eventData.event === ComponentEvent.SelectAll) {
-            //eventData.eventRef.stopPropagation();
-            //eventData.eventRef.stopImmediatePropagation();
-            eventData.eventRef.preventDefault();
-            updateSelectFlagForAllComps(true, true);
+            selectAllComps_Proc(true);
             return;
         }
+
+        insertComponent(
+            eventData.props.afterMount.insertPositionPreference,
+            eventData.type
+        );
     };
 
-    function updateSelectFlagForAllComps(value: boolean, isCEvent: boolean) {
+    function selectAllComps_Proc(value: boolean) {
         Object.getOwnPropertyNames(elements).forEach((key) => {
             elements[key]?.selectComponenet(value);
         });
-        isChassisEvent.set(isCEvent);
     }
 
     function insertComponent(position: ComponentPosition, tool: Tool) {

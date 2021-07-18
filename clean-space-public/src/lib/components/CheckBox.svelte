@@ -1,7 +1,12 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-    import { ComponentEvent, Key, Tool } from "../../utils/enums";
+    import {
+        ComponentEvent,
+        ComponentPosition,
+        Key,
+        Tool,
+    } from "../../utils/enums";
     import { createEventDispatcher, tick } from "svelte";
     import { onMount } from "svelte";
     import type { ComponentProps, AfterOnMount } from "../../utils/interfaces";
@@ -26,6 +31,7 @@
         eventDispatcher: createEventDispatcher(),
         preventBackspace: false,
         isSelected: false,
+        insertPositionPreference: ComponentPosition.InsertAfterCaret,
     };
 
     onMount(() => {
