@@ -1,7 +1,7 @@
 import { TextEditorEvent, Key, Tool, KeyboardEvent, ComponentPosition } from "./enums";
 import { focusedComponent } from "../utils/store";
 import type { ComponentEventData, ComponentProps } from "./interfaces";
-import { compute_rest_props } from "svelte/internal";
+import { compute_rest_props, text } from "svelte/internal";
 import { get } from 'svelte/store';
 
 
@@ -47,11 +47,15 @@ export const onKeyboardEvent = (model: { props: ComponentProps, event: any, keyb
     let isCtrlKey = model.event.ctrlKey;
     let isShiftKey = model.event.shiftKey;
     let isTextEmpty = model.isEmpty;
+
     if (model.keyboardEvent === KeyboardEvent.OnKeyDown) {
         if (isTextEditorEvent(isCtrlKey, keyCode)) {
-            model.event.preventDefault();
-            model.props.afterMount.isSelected = true;
-            dispatchTextEditorEvent({ props: model.props, event: resolveTextEditorEvent(isShiftKey, isCtrlKey, isTextEmpty, keyCode), eventRef: model.event });
+            let editorEvent = resolveTextEditorEvent(isShiftKey, isCtrlKey, isTextEmpty, keyCode);
+            if (editorEvent !== TextEditorEvent.Typing) {
+                model.props.afterMount.isSelected = true;
+                model.event.preventDefault();
+                dispatchTextEditorEvent({ props: model.props, event: resolveTextEditorEvent(isShiftKey, isCtrlKey, isTextEmpty, keyCode), eventRef: model.event });
+            }
         }
     } else if (model.keyboardEvent === KeyboardEvent.OnKeyUp) {
         //console.log("OnKeyUp");
