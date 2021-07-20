@@ -21,7 +21,6 @@
     let afterOnMount: AfterOnMount = {
         mainNode: null,
         eventDispatcher: createEventDispatcher(),
-        preventBackspace: false,
         isSelected: false,
         insertPositionPreference: ComponentPosition.InsertAfterCaret,
     };
@@ -49,7 +48,7 @@
         setCaretPosition(props.afterMount.mainNode, text.length);
     };
 
-    export const selectComponenet = (value: boolean) => {
+    export const setIsSelected = (value: boolean) => {
         if (props.afterMount === undefined) return;
         isSelected = value;
         props.afterMount.isSelected = value;

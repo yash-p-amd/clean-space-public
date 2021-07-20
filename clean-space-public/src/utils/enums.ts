@@ -1,4 +1,4 @@
-export enum ComponentEvent {
+export enum TextEditorEvent {
     SelectAll = "SelectAll",
     Select = "Select",
     Copy = "Copy",
@@ -9,6 +9,9 @@ export enum ComponentEvent {
     CutAll = "CutAll",
     Delete = "Delete",
     DeleteAll = "DeleteAll",
+    Undo = "Undo",
+    Typing = "Typing",
+    NewLine = "NewLine",
 }
 
 export enum KeyboardEvent {
@@ -41,6 +44,10 @@ export enum Key {
     Space = "Space",
     Backspace = "Backspace",
     A = "KeyA",
+    C = "KeyC",
+    V = "KeyV",
+    X = "KeyX",
+    Z = "KeyZ",
 }
 
 export enum ComponentPosition {

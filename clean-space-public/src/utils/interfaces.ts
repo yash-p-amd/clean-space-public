@@ -1,4 +1,4 @@
-import type { Tool, ComponentEvent, ComponentPosition } from "../utils/enums";
+import type { Tool, TextEditorEvent, ComponentPosition } from "../utils/enums";
 
 
 export interface DocumentData {
@@ -10,13 +10,12 @@ export interface ComponentProps {
     id: string;
     index: number;
     type: Tool;
-    afterMount?: AfterOnMount;
+    afterMount: AfterOnMount;
 }
 
 export interface AfterOnMount {
     mainNode: any;
     eventDispatcher: any;
-    preventBackspace: boolean;
     isSelected: boolean;
     insertPositionPreference: ComponentPosition;
 }
@@ -34,7 +33,7 @@ export interface ToolBoxEventData {
 export interface ComponentEventData {
     id: string;
     type: Tool;
-    event: ComponentEvent;
+    event: TextEditorEvent;
     eventRef: any;
     props: ComponentProps;
 }

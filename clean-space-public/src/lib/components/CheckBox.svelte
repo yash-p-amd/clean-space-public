@@ -2,13 +2,13 @@
 
 <script lang="ts">
     import {
-        ComponentEvent,
+        TextEditorEvent,
         ComponentPosition,
         Key,
         Tool,
     } from "../../utils/enums";
     import { createEventDispatcher, tick } from "svelte";
-    import { onMount } from "svelte";
+    import { onMount, afterUpdate } from "svelte";
     import type { ComponentProps, AfterOnMount } from "../../utils/interfaces";
     import {
         setFocusOnNode,
@@ -39,6 +39,10 @@
         setFocusOnNode({ props: props });
     });
 
+    afterUpdate(() => {
+        //isSelected = false;
+    });
+
     const onTextClick = (event) => {};
 
     const onTextFocus = () => updateFocusNodeInStore({ props: props });
@@ -57,7 +61,7 @@
         setFocusOnNode({ props: props });
     };
 
-    export const selectComponenet = (value: boolean) => {
+    export const setIsSelected = (value: boolean) => {
         if (props.afterMount === undefined) return;
         isSelected = value;
         props.afterMount.isSelected = value;

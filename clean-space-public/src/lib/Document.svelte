@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { onMount, afterUpdate } from "svelte";
     import CheckBox from "./components/CheckBox.svelte";
     import ToolBox from "./ToolBox.svelte";
     import Text from "./components/Text.svelte";
@@ -12,7 +12,7 @@
     } from "../utils/interfaces";
     import {
         Tool,
-        ComponentEvent,
+        TextEditorEvent,
         ComponentPosition,
         Key,
     } from "../utils/enums";
@@ -51,6 +51,10 @@
         });
     }
 
+    afterUpdate(() => {
+        switch_isSelected(false);
+    });
+
     const onToolBoxEventData = (event) => {
         let eventData = event.detail as ToolBoxEventData;
         insertComponent(ComponentPosition.InsertAtLast, eventData.selectedTool);
@@ -87,60 +91,59 @@
         //elements[$focusedComponent.id].compOnKeyPress(event);
     };
 
-    const removeComponent = (removeEvent: ComponentEvent) => {
-        if (removeEvent === ComponentEvent.Delete) {
-            let firstResult = storage.find(
-                (ele) => ele.componentProps.afterMount.isSelected
-            );
-            let firstResultId = firstResult.componentProps.id;
-            storage = storage.filter(
-                (comp) => !comp.componentProps.afterMount.isSelected
-            );
-            if (elements[firstResultId] !== undefined) {
-                elements[firstResultId].setFocus();
-            }
-            return;
+    const removeComponent = async (
+        removeEvent: TextEditorEvent,
+        callback: Function
+    ) => {
+        let siblingId = getPreviousSiblingId_isSelected(storage);
+        storage = storage.filter(
+            (comp) => !comp.componentProps.afterMount.isSelected
+        );
+        if (removeEvent === TextEditorEvent.Delete) {
+            elements[siblingId].setFocus();
         }
-        if (removeEvent === ComponentEvent.DeleteAll) {
-            storage = storage.filter(
-                (comp) => !comp.componentProps.afterMount.isSelected
-            );
-        }
+        await tick();
+        callback();
     };
 
-    // const removeComponent = async () => {
-    //     storage = storage.filter(
-    //         (item) => !item.componentProps.afterMount.isSelected
-    //     );
-    //     await tick();
-    //     updateSelectFlagForAllComps(false);
-    // };
+    function getPreviousSiblingId_isSelected(input: DocumentData[]): string {
+        let firstMatchIndex = input.findIndex(
+            (ele) => ele.componentProps.afterMount.isSelected
+        );
+        let previousSiblingIndex =
+            firstMatchIndex > 0 ? firstMatchIndex - 1 : 0;
+        return input[previousSiblingIndex].componentProps.id;
+    }
 
     const handleMessage = (event) => {
         let eventData = event.detail as ComponentEventData;
 
         if (
-            eventData.event === ComponentEvent.Delete ||
-            eventData.event === ComponentEvent.DeleteAll
+            eventData.event === TextEditorEvent.Delete ||
+            eventData.event === TextEditorEvent.DeleteAll
         ) {
-            removeComponent(eventData.event);
+            removeComponent(eventData.event, () => {
+                switch_isSelected(false);
+            });
             return;
         }
 
-        if (eventData.event === ComponentEvent.SelectAll) {
-            selectAllComps_Proc(true);
+        if (eventData.event === TextEditorEvent.SelectAll) {
+            switch_isSelected(true);
             return;
         }
 
-        insertComponent(
-            eventData.props.afterMount.insertPositionPreference,
-            eventData.type
-        );
+        if (eventData.event === TextEditorEvent.NewLine) {
+            insertComponent(
+                eventData.props.afterMount.insertPositionPreference,
+                eventData.type
+            );
+        }
     };
 
-    function selectAllComps_Proc(value: boolean) {
+    function switch_isSelected(value: boolean) {
         Object.getOwnPropertyNames(elements).forEach((key) => {
-            elements[key]?.selectComponenet(value);
+            elements[key]?.setIsSelected(value);
         });
     }
 
@@ -171,6 +174,13 @@
                     id: util.generateNewId(tool),
                     index: storage.length,
                     type: tool,
+                    afterMount: {
+                        insertPositionPreference:
+                            ComponentPosition.InsertAfterCaret,
+                        isSelected: false,
+                        mainNode: null,
+                        eventDispatcher: null,
+                    },
                 },
             };
         }
@@ -181,6 +191,13 @@
                     id: util.generateNewId(tool),
                     index: storage.length,
                     type: tool,
+                    afterMount: {
+                        insertPositionPreference:
+                            ComponentPosition.InsertAfterCaret,
+                        isSelected: false,
+                        mainNode: null,
+                        eventDispatcher: null,
+                    },
                 },
             };
         }
@@ -191,10 +208,17 @@
                     id: util.generateNewId(tool),
                     index: storage.length,
                     type: tool,
+                    afterMount: {
+                        insertPositionPreference:
+                            ComponentPosition.InsertAfterCaret,
+                        isSelected: false,
+                        mainNode: null,
+                        eventDispatcher: null,
+                    },
                 },
             };
         }
-        return null;
+        throw new Error(`Invalid tool : ${tool}`);
     }
 </script>
 

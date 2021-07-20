@@ -1,4 +1,4 @@
-import { ComponentEvent, Key, Tool, KeyboardEvent, ComponentPosition } from "./enums";
+import { TextEditorEvent, Key, Tool, KeyboardEvent, ComponentPosition } from "./enums";
 import { focusedComponent } from "../utils/store";
 import type { ComponentEventData, ComponentProps } from "./interfaces";
 import { compute_rest_props } from "svelte/internal";
@@ -16,6 +16,7 @@ function foo(model: { property1: number; property2: number }) {
 
 export const setFocusOnNode = (model: { props: ComponentProps }) => {
     model.props.afterMount.mainNode.focus();
+    return model;
 }
 
 export const updateFocusNodeInStore = (model: { props: ComponentProps }) => {
@@ -23,9 +24,10 @@ export const updateFocusNodeInStore = (model: { props: ComponentProps }) => {
         id: model.props.id,
         type: model.props.type,
     });
+    return model;
 }
 
-export const triggerEvent = (model: { props: ComponentProps, event: ComponentEvent, eventRef: any }) => {
+export const dispatchTextEditorEvent = (model: { props: ComponentProps, event: TextEditorEvent, eventRef: any }) => {
 
     let eData: ComponentEventData = {
         event: model.event,
@@ -37,42 +39,20 @@ export const triggerEvent = (model: { props: ComponentProps, event: ComponentEve
 
     console.log(`Dispatching : ${eData.event} -> ${eData.id}`);
     model.props.afterMount.eventDispatcher("message", eData);
+    return model;
 };
 
 export const onKeyboardEvent = (model: { props: ComponentProps, event: any, keyboardEvent: KeyboardEvent, isEmpty: boolean }) => {
+    let keyCode = model.event.code;
+    let isCtrlKey = model.event.ctrlKey;
+    let isShiftKey = model.event.shiftKey;
+    let isTextEmpty = model.isEmpty;
     if (model.keyboardEvent === KeyboardEvent.OnKeyDown) {
-
-        // Enter
-        if (model.event.code === Key.Enter && !model.event.shiftKey) {
+        if (isTextEditorEvent(isCtrlKey, keyCode)) {
             model.event.preventDefault();
-            triggerEvent({
-                props: model.props,
-                event: ComponentEvent.Select,
-                eventRef: model.event,
-            });
+            model.props.afterMount.isSelected = true;
+            dispatchTextEditorEvent({ props: model.props, event: resolveTextEditorEvent(isShiftKey, isCtrlKey, isTextEmpty, keyCode), eventRef: model.event });
         }
-
-        //Backspace
-        // if (model.event.code === Key.Backspace && model.isEmpty) {
-        //     model.event.preventDefault();
-        //     model.props.afterMount.isSelected = true;
-        //     triggerEvent({ props: model.props, event: ComponentEvent.Delete, eventRef: model.event });
-        // }
-
-        if (model.event.code === Key.Backspace) {
-            if (model.isEmpty) {
-                model.event.preventDefault();
-                model.props.afterMount.isSelected = true;
-                triggerEvent({ props: model.props, event: ComponentEvent.Delete, eventRef: model.event });
-            }
-        }
-
-        //Ctrl + A
-        if (model.event.code === Key.A && model.event.ctrlKey) {
-            model.event.preventDefault();
-            triggerEvent({ props: model.props, event: ComponentEvent.SelectAll, eventRef: model.event });
-        }
-
     } else if (model.keyboardEvent === KeyboardEvent.OnKeyUp) {
         //console.log("OnKeyUp");
 
@@ -82,18 +62,58 @@ export const onKeyboardEvent = (model: { props: ComponentProps, event: any, keyb
     } else {
 
     }
+    return model;
+}
 
-    return;
+function isTextEditorEvent(isCtrlKey: boolean, key: string): boolean {
+    let keys = [Key.A, Key.C, Key.V, Key.X, Key.Enter, Key.Backspace];
+    if (keys.indexOf(Key[key]) > -1)
+        return true;
+    return false;
+}
+
+function resolveTextEditorEvent(isShiftKey: boolean, isCtrlKey: boolean, isTextEmpty: boolean, key: string): TextEditorEvent {
+    switch (key) {
+        case Key.A:
+            return isCtrlKey ? TextEditorEvent.SelectAll : TextEditorEvent.Typing;
+            break;
+
+        case Key.C:
+            return isCtrlKey ? TextEditorEvent.Copy : TextEditorEvent.Typing;
+            break;
+
+        case Key.X:
+            return isCtrlKey ? TextEditorEvent.Cut : TextEditorEvent.Typing;
+            break;
+
+        case Key.V:
+            return isCtrlKey ? TextEditorEvent.Paste : TextEditorEvent.Typing;
+            break;
+
+        case Key.Z:
+            return isCtrlKey ? TextEditorEvent.Undo : TextEditorEvent.Typing;
+
+        case Key.Enter:
+            return isShiftKey ? TextEditorEvent.Typing : TextEditorEvent.NewLine;
+
+        case Key.Backspace:
+            return isTextEmpty ? TextEditorEvent.Delete : TextEditorEvent.Typing;
+
+        default:
+            return TextEditorEvent.Typing;
+            break;
+    }
 }
 
 export const setCaretPosition = (el, pos) => {
     const selection = window.getSelection();
     const range = document.createRange();
-    selection.removeAllRanges();
-    range.selectNodeContents(el);
-    range.collapse(false);
-    selection.addRange(range);
-    //el.focus();
+    if (selection !== null) {
+        selection.removeAllRanges();
+        range.selectNodeContents(el);
+        range.collapse(false);
+        selection.addRange(range);
+    }
 }
 
 // export const SetCaretPosition = (el, pos) => {
