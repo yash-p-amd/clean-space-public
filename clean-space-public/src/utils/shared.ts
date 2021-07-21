@@ -1,7 +1,7 @@
 import { TextEditorEvent, Key, Tool, KeyboardEvent, ComponentPosition } from "./enums";
-import { focusedComponent } from "../utils/store";
+import { focusedComponent, lastTextEditorEvent } from "../utils/store";
 import type { ComponentEventData, ComponentProps } from "./interfaces";
-import { compute_rest_props, text } from "svelte/internal";
+import { compute_rest_props, debug, text } from "svelte/internal";
 import { get } from 'svelte/store';
 
 
@@ -48,65 +48,97 @@ export const onKeyboardEvent = (model: { props: ComponentProps, event: any, keyb
     let isShiftKey = model.event.shiftKey;
     let isTextEmpty = model.isEmpty;
 
-    if (model.keyboardEvent === KeyboardEvent.OnKeyDown) {
-        if (isTextEditorEvent(isCtrlKey, keyCode)) {
-            let editorEvent = resolveTextEditorEvent(isShiftKey, isCtrlKey, isTextEmpty, keyCode);
-            if (editorEvent !== TextEditorEvent.Typing) {
-                model.props.afterMount.isSelected = true;
-                model.event.preventDefault();
-                dispatchTextEditorEvent({ props: model.props, event: resolveTextEditorEvent(isShiftKey, isCtrlKey, isTextEmpty, keyCode), eventRef: model.event });
-            }
-        }
-    } else if (model.keyboardEvent === KeyboardEvent.OnKeyUp) {
-        //console.log("OnKeyUp");
+    console.log(model.keyboardEvent);
+    if (killUnwantedKeyboardEvent(keyCode, model.keyboardEvent)) return;
 
-    } else if (model.keyboardEvent === KeyboardEvent.OnKeyPress) {
-        //console.log("OnKeyPress");
-
-    } else {
-
+    if (isTextEditorEvent(isCtrlKey, keyCode)) {
+        let editorEvent = resolveTextEditorEvent(isShiftKey, isCtrlKey, isTextEmpty, keyCode);
+        if (editorEvent === TextEditorEvent.Typing) return;
+        model.props.afterMount.isSelected = true;
+        model.event.preventDefault();
+        dispatchTextEditorEvent({ props: model.props, event: editorEvent, eventRef: model.event });
     }
+
+    // if (resolveKeyboardEvent(keyCode) === KeyboardEvent.OnKeyDown) {
+
+    // } else if (resolveKeyboardEvent(keyCode) === KeyboardEvent.OnKeyUp) {
+
+    // } else if (resolveKeyboardEvent(keyCode) === KeyboardEvent.OnKeyPress) {
+
+    // } else {
+
+    // }
     return model;
 }
 
 function isTextEditorEvent(isCtrlKey: boolean, key: string): boolean {
     let keys = [Key.A, Key.C, Key.V, Key.X, Key.Enter, Key.Backspace];
-    if (keys.indexOf(Key[key]) > -1)
+    let extractKey = Object.keys(Key).find(
+        k => Key[k] === key
+    );
+    if (extractKey !== undefined && keys.indexOf(Key[extractKey]) > -1)
         return true;
     return false;
 }
 
+//resolveKeyboardEvent(keyCode, model.keyboardEvent)
+function resolveKeyboardEvent(key: string, modelKeyboardEvent: any): KeyboardEvent {
+    let keydownKeys = [Key.ControlLeft, Key.ControlRight, Key.Enter];
+    if (keydownKeys.indexOf(Key[key]) > -1)
+        return KeyboardEvent.OnKeyDown;
+    return KeyboardEvent.OnKeyPress;
+}
+
+function killUnwantedKeyboardEvent(key: string, modelKeyboardEvent: any): boolean {
+    if (key === Key.Enter && (modelKeyboardEvent === KeyboardEvent.OnKeyPress || modelKeyboardEvent === KeyboardEvent.OnKeyUp)) return true;
+    if (key === Key.Backspace && (modelKeyboardEvent === KeyboardEvent.OnKeyPress || modelKeyboardEvent === KeyboardEvent.OnKeyUp)) return true;
+    if (key === Key.ControlLeft || key === Key.ControlRight) return true;
+    return false;
+}
+
 function resolveTextEditorEvent(isShiftKey: boolean, isCtrlKey: boolean, isTextEmpty: boolean, key: string): TextEditorEvent {
+    let editorEvent: TextEditorEvent;
     switch (key) {
         case Key.A:
-            return isCtrlKey ? TextEditorEvent.SelectAll : TextEditorEvent.Typing;
+            editorEvent = isCtrlKey ? TextEditorEvent.SelectAll : TextEditorEvent.Typing;
             break;
 
         case Key.C:
-            return isCtrlKey ? TextEditorEvent.Copy : TextEditorEvent.Typing;
+            editorEvent = isCtrlKey ? TextEditorEvent.Copy : TextEditorEvent.Typing;
             break;
 
         case Key.X:
-            return isCtrlKey ? TextEditorEvent.Cut : TextEditorEvent.Typing;
+            editorEvent = isCtrlKey ? TextEditorEvent.Cut : TextEditorEvent.Typing;
             break;
 
         case Key.V:
-            return isCtrlKey ? TextEditorEvent.Paste : TextEditorEvent.Typing;
+            editorEvent = isCtrlKey ? TextEditorEvent.Paste : TextEditorEvent.Typing;
             break;
 
         case Key.Z:
-            return isCtrlKey ? TextEditorEvent.Undo : TextEditorEvent.Typing;
+            editorEvent = isCtrlKey ? TextEditorEvent.Undo : TextEditorEvent.Typing;
+            break;
 
         case Key.Enter:
-            return isShiftKey ? TextEditorEvent.Typing : TextEditorEvent.NewLine;
+            editorEvent = isShiftKey ? TextEditorEvent.Typing : TextEditorEvent.NewLine;
+            break;
 
         case Key.Backspace:
-            return isTextEmpty ? TextEditorEvent.Delete : TextEditorEvent.Typing;
+            let temp: TextEditorEvent;
+            if (get(lastTextEditorEvent) === TextEditorEvent.SelectAll) {
+                temp = TextEditorEvent.DeleteAll;
+            } else {
+                temp = isTextEmpty ? TextEditorEvent.Delete : TextEditorEvent.Typing;
+            }
+            editorEvent = temp;
+            break;
 
         default:
-            return TextEditorEvent.Typing;
+            editorEvent = TextEditorEvent.Typing;
             break;
     }
+    lastTextEditorEvent.set(editorEvent);
+    return editorEvent;
 }
 
 export const setCaretPosition = (el, pos) => {

@@ -43,6 +43,8 @@ export enum Key {
     Enter = "Enter",
     Space = "Space",
     Backspace = "Backspace",
+    ControlLeft = "ControlLeft",
+    ControlRight = "ControlRight",
     A = "KeyA",
     C = "KeyC",
     V = "KeyV",
