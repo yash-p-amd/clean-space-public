@@ -1,5 +1,5 @@
 import { TextEditorEvent, Key, Tool, KeyboardEvent, ComponentPosition } from "./enums";
-import { focusedComponent, lastTextEditorEvent } from "../utils/store";
+import { focusedComponent, lastTextEditorEvent, isShiftPressed } from "../utils/store";
 import type { ComponentEventData, ComponentProps } from "./interfaces";
 import { compute_rest_props, debug, text } from "svelte/internal";
 import { get } from 'svelte/store';
@@ -47,11 +47,12 @@ export const onKeyboardEvent = (model: { props: ComponentProps, event: any, keyb
     let isCtrlKey = model.event.ctrlKey;
     let isShiftKey = model.event.shiftKey;
     let isTextEmpty = model.isEmpty;
+    let modelKeyboardEvent = model.keyboardEvent;
 
-    console.log(model.keyboardEvent);
-    if (killUnwantedKeyboardEvent(keyCode, model.keyboardEvent)) return;
+    if (IgnoreUnwantedKeyboardEvent(keyCode, modelKeyboardEvent)) return;
 
     if (isTextEditorEvent(isCtrlKey, keyCode)) {
+        if (isShiftKey) updateStore_isShiftPressed(modelKeyboardEvent);
         let editorEvent = resolveTextEditorEvent(isShiftKey, isCtrlKey, isTextEmpty, keyCode);
         if (editorEvent === TextEditorEvent.Typing) return;
         model.props.afterMount.isSelected = true;
@@ -72,7 +73,7 @@ export const onKeyboardEvent = (model: { props: ComponentProps, event: any, keyb
 }
 
 function isTextEditorEvent(isCtrlKey: boolean, key: string): boolean {
-    let keys = [Key.A, Key.C, Key.V, Key.X, Key.Enter, Key.Backspace];
+    let keys = [Key.A, Key.C, Key.V, Key.X, Key.Enter, Key.Backspace, Key.ShiftLeft, Key.ShiftRight, Key.ArrowUp, Key.ArrowDown];
     let extractKey = Object.keys(Key).find(
         k => Key[k] === key
     );
@@ -89,10 +90,21 @@ function resolveKeyboardEvent(key: string, modelKeyboardEvent: any): KeyboardEve
     return KeyboardEvent.OnKeyPress;
 }
 
-function killUnwantedKeyboardEvent(key: string, modelKeyboardEvent: any): boolean {
+function updateStore_isShiftPressed(modelKeyboardEvent: any) {
+    if (modelKeyboardEvent === KeyboardEvent.OnKeyDown) {
+        isShiftPressed.set(true);
+    }
+    if (modelKeyboardEvent === KeyboardEvent.OnKeyUp) {
+        isShiftPressed.set(false);
+    }
+}
+
+function IgnoreUnwantedKeyboardEvent(key: string, modelKeyboardEvent: any): boolean {
     if (key === Key.Enter && (modelKeyboardEvent === KeyboardEvent.OnKeyPress || modelKeyboardEvent === KeyboardEvent.OnKeyUp)) return true;
     if (key === Key.Backspace && (modelKeyboardEvent === KeyboardEvent.OnKeyPress || modelKeyboardEvent === KeyboardEvent.OnKeyUp)) return true;
     if (key === Key.ControlLeft || key === Key.ControlRight) return true;
+    if ((key === Key.ShiftLeft || key === Key.ShiftRight) && modelKeyboardEvent === KeyboardEvent.OnKeyPress) return true;
+    console.log(`${key} : ${modelKeyboardEvent}`);
     return false;
 }
 
@@ -124,14 +136,20 @@ function resolveTextEditorEvent(isShiftKey: boolean, isCtrlKey: boolean, isTextE
             break;
 
         case Key.Backspace:
-            let temp: TextEditorEvent;
             if (get(lastTextEditorEvent) === TextEditorEvent.SelectAll) {
-                temp = TextEditorEvent.DeleteAll;
+                editorEvent = TextEditorEvent.DeleteAll;
             } else {
-                temp = isTextEmpty ? TextEditorEvent.Delete : TextEditorEvent.Typing;
+                editorEvent = isTextEmpty ? TextEditorEvent.Delete : TextEditorEvent.Typing;
             }
-            editorEvent = temp;
             break;
+
+        // case Key.ArrowUp:
+        //     editorEvent = isShiftKey ? TextEditorEvent.Select : TextEditorEvent.Typing;
+        //     break;
+
+        // case Key.ArrowDown:
+        //     editorEvent = isShiftKey ? TextEditorEvent.Select : TextEditorEvent.Typing;
+        //     break;
 
         default:
             editorEvent = TextEditorEvent.Typing;

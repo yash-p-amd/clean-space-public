@@ -45,6 +45,8 @@ export enum Key {
     Backspace = "Backspace",
     ControlLeft = "ControlLeft",
     ControlRight = "ControlRight",
+    ShiftLeft = "ShiftLeft",
+    ShiftRight = "ShiftRight",
     A = "KeyA",
     C = "KeyC",
     V = "KeyV",

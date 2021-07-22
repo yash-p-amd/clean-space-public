@@ -17,6 +17,8 @@
         onKeyboardEvent,
     } from "../../utils/shared";
     import { KeyboardEvent } from "../../utils/enums";
+    import { isShiftPressed } from "../../utils/store";
+    import { get } from "svelte/store";
 
     export let props: ComponentProps;
 
@@ -45,7 +47,11 @@
 
     const onTextClick = (event) => {};
 
-    const onTextFocus = () => updateFocusNodeInStore({ props: props });
+    const onTextFocus = () => {
+        //console.log(get(isShiftPressed));
+        console.log($isShiftPressed);
+        updateFocusNodeInStore({ props: props });
+    };
 
     const attachKeyboardEvent = (event: any, eventType: KeyboardEvent) => {
         onKeyboardEvent({
