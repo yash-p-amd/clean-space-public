@@ -7,11 +7,11 @@
         AfterOnMount,
     } from "../../../utils/interfaces";
     import {
-        onKeyboardEvent,
+        onKeyboardEventEnum,
         setFocusOnNode,
         updateFocusNodeInStore,
     } from "../../../utils/shared";
-    import { ComponentPosition, KeyboardEvent } from "../../../utils/enums";
+    import { ComponentPosition, KeyboardEventEnum } from "../../../utils/enums";
 
     export let props: ComponentProps;
 
@@ -33,11 +33,14 @@
 
     const onTextFocus = () => updateFocusNodeInStore({ props: props });
 
-    const attachKeyboardEvent = (event: any, eventType: KeyboardEvent) => {
-        onKeyboardEvent({
+    const attachKeyboardEventEnum = (
+        event: any,
+        eventType: KeyboardEventEnum
+    ) => {
+        onKeyboardEventEnum({
             props: props,
             event: event,
-            keyboardEvent: eventType,
+            KeyboardEventEnum: eventType,
             isEmpty: isEmpty,
         });
     };
@@ -65,13 +68,13 @@
             bind:this={afterOnMount.mainNode}
             on:focus={onTextFocus}
             on:keydown={(event) => {
-                attachKeyboardEvent(event, KeyboardEvent.OnKeyDown);
+                attachKeyboardEventEnum(event, KeyboardEventEnum.OnKeyDown);
             }}
             on:keypress={(event) => {
-                attachKeyboardEvent(event, KeyboardEvent.OnKeyPress);
+                attachKeyboardEventEnum(event, KeyboardEventEnum.OnKeyPress);
             }}
             on:keyup={(event) => {
-                attachKeyboardEvent(event, KeyboardEvent.OnKeyUp);
+                attachKeyboardEventEnum(event, KeyboardEventEnum.OnKeyUp);
             }}
         />
     </h1>

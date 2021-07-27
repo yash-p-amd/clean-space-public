@@ -1,4 +1,4 @@
-import { TextEditorEvent, Key, Tool, KeyboardEvent, ComponentPosition } from "./enums";
+import { TextEditorEvent, Key, Tool, KeyboardEventEnum, ComponentPosition } from "./enums";
 import { focusedComponent, lastTextEditorEvent, isShiftPressed } from "../utils/store";
 import type { ComponentEventData, ComponentProps } from "./interfaces";
 import { compute_rest_props, debug, text } from "svelte/internal";
@@ -42,17 +42,17 @@ export const dispatchTextEditorEvent = (model: { props: ComponentProps, event: T
     return model;
 };
 
-export const onKeyboardEvent = (model: { props: ComponentProps, event: any, keyboardEvent: KeyboardEvent, isEmpty: boolean }) => {
+export const onKeyboardEventEnum = (model: { props: ComponentProps, event: any, KeyboardEventEnum: KeyboardEventEnum, isEmpty: boolean }) => {
     let keyCode = model.event.code;
     let isCtrlKey = model.event.ctrlKey;
     let isShiftKey = model.event.shiftKey;
     let isTextEmpty = model.isEmpty;
-    let modelKeyboardEvent = model.keyboardEvent;
+    let modelKeyboardEventEnum = model.KeyboardEventEnum;
 
-    if (IgnoreUnwantedKeyboardEvent(keyCode, modelKeyboardEvent)) return;
+    if (isUnwantedKeyboardEventEnum(keyCode, modelKeyboardEventEnum)) return;
 
     if (isTextEditorEvent(isCtrlKey, keyCode)) {
-        if (isShiftKey) updateStore_isShiftPressed(modelKeyboardEvent);
+        if (isShiftKey) updateStore_isShiftPressed(modelKeyboardEventEnum);
         let editorEvent = resolveTextEditorEvent(isShiftKey, isCtrlKey, isTextEmpty, keyCode);
         if (editorEvent === TextEditorEvent.Typing) return;
         model.props.afterMount.isSelected = true;
@@ -60,11 +60,11 @@ export const onKeyboardEvent = (model: { props: ComponentProps, event: any, keyb
         dispatchTextEditorEvent({ props: model.props, event: editorEvent, eventRef: model.event });
     }
 
-    // if (resolveKeyboardEvent(keyCode) === KeyboardEvent.OnKeyDown) {
+    // if (resolveKeyboardEventEnum(keyCode) === KeyboardEventEnum.OnKeyDown) {
 
-    // } else if (resolveKeyboardEvent(keyCode) === KeyboardEvent.OnKeyUp) {
+    // } else if (resolveKeyboardEventEnum(keyCode) === KeyboardEventEnum.OnKeyUp) {
 
-    // } else if (resolveKeyboardEvent(keyCode) === KeyboardEvent.OnKeyPress) {
+    // } else if (resolveKeyboardEventEnum(keyCode) === KeyboardEventEnum.OnKeyPress) {
 
     // } else {
 
@@ -82,29 +82,29 @@ function isTextEditorEvent(isCtrlKey: boolean, key: string): boolean {
     return false;
 }
 
-//resolveKeyboardEvent(keyCode, model.keyboardEvent)
-function resolveKeyboardEvent(key: string, modelKeyboardEvent: any): KeyboardEvent {
+//resolveKeyboardEventEnum(keyCode, model.KeyboardEventEnum)
+function resolveKeyboardEventEnum(key: string, modelKeyboardEventEnum: any): KeyboardEventEnum {
     let keydownKeys = [Key.ControlLeft, Key.ControlRight, Key.Enter];
     if (keydownKeys.indexOf(Key[key]) > -1)
-        return KeyboardEvent.OnKeyDown;
-    return KeyboardEvent.OnKeyPress;
+        return KeyboardEventEnum.OnKeyDown;
+    return KeyboardEventEnum.OnKeyPress;
 }
 
-function updateStore_isShiftPressed(modelKeyboardEvent: any) {
-    if (modelKeyboardEvent === KeyboardEvent.OnKeyDown) {
+function updateStore_isShiftPressed(modelKeyboardEventEnum: any) {
+    if (modelKeyboardEventEnum === KeyboardEventEnum.OnKeyDown) {
         isShiftPressed.set(true);
     }
-    if (modelKeyboardEvent === KeyboardEvent.OnKeyUp) {
+    if (modelKeyboardEventEnum === KeyboardEventEnum.OnKeyUp) {
         isShiftPressed.set(false);
     }
 }
 
-function IgnoreUnwantedKeyboardEvent(key: string, modelKeyboardEvent: any): boolean {
-    if (key === Key.Enter && (modelKeyboardEvent === KeyboardEvent.OnKeyPress || modelKeyboardEvent === KeyboardEvent.OnKeyUp)) return true;
-    if (key === Key.Backspace && (modelKeyboardEvent === KeyboardEvent.OnKeyPress || modelKeyboardEvent === KeyboardEvent.OnKeyUp)) return true;
+function isUnwantedKeyboardEventEnum(key: string, modelKeyboardEventEnum: any): boolean {
+    if (key === Key.Enter && (modelKeyboardEventEnum === KeyboardEventEnum.OnKeyPress || modelKeyboardEventEnum === KeyboardEventEnum.OnKeyUp)) return true;
+    if (key === Key.Backspace && (modelKeyboardEventEnum === KeyboardEventEnum.OnKeyPress || modelKeyboardEventEnum === KeyboardEventEnum.OnKeyUp)) return true;
     if (key === Key.ControlLeft || key === Key.ControlRight) return true;
-    if ((key === Key.ShiftLeft || key === Key.ShiftRight) && modelKeyboardEvent === KeyboardEvent.OnKeyPress) return true;
-    console.log(`${key} : ${modelKeyboardEvent}`);
+    if ((key === Key.ShiftLeft || key === Key.ShiftRight) && modelKeyboardEventEnum === KeyboardEventEnum.OnKeyPress) return true;
+    console.log(`${key} : ${modelKeyboardEventEnum}`);
     return false;
 }
 
@@ -143,13 +143,13 @@ function resolveTextEditorEvent(isShiftKey: boolean, isCtrlKey: boolean, isTextE
             }
             break;
 
-        // case Key.ArrowUp:
-        //     editorEvent = isShiftKey ? TextEditorEvent.Select : TextEditorEvent.Typing;
-        //     break;
+        case Key.ArrowUp:
+            editorEvent = isShiftKey ? TextEditorEvent.SelectUp : TextEditorEvent.Typing;
+            break;
 
-        // case Key.ArrowDown:
-        //     editorEvent = isShiftKey ? TextEditorEvent.Select : TextEditorEvent.Typing;
-        //     break;
+        case Key.ArrowDown:
+            editorEvent = isShiftKey ? TextEditorEvent.SelectDown : TextEditorEvent.Typing;
+            break;
 
         default:
             editorEvent = TextEditorEvent.Typing;
@@ -169,31 +169,3 @@ export const setCaretPosition = (el, pos) => {
         selection.addRange(range);
     }
 }
-
-// export const SetCaretPosition = (el, pos) => {
-
-//     // Loop through all child nodes
-//     for (var node of el.childNodes) {
-//         if (node.nodeType == 3) { // we have a text node
-//             if (node.length >= pos) {
-//                 // finally add our range
-//                 var range = document.createRange(),
-//                     sel = window.getSelection();
-//                 range.setStart(node, pos);
-//                 range.setEnd(node, pos);
-//                 range.collapse(true);
-//                 sel.removeAllRanges();
-//                 sel.addRange(range);
-//                 return -1; // we are done
-//             } else {
-//                 pos -= node.length;
-//             }
-//         } else {
-//             pos = SetCaretPosition(node, pos);
-//             if (pos == -1) {
-//                 return -1; // no need to finish the for loop
-//             }
-//         }
-//     }
-//     return pos; // needed because of recursion stuff
-// }

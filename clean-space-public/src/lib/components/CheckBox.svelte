@@ -14,9 +14,9 @@
         setFocusOnNode,
         updateFocusNodeInStore,
         setCaretPosition,
-        onKeyboardEvent,
+        onKeyboardEventEnum,
     } from "../../utils/shared";
-    import { KeyboardEvent } from "../../utils/enums";
+    import { KeyboardEventEnum } from "../../utils/enums";
     import { isShiftPressed } from "../../utils/store";
     import { get } from "svelte/store";
 
@@ -53,11 +53,14 @@
         updateFocusNodeInStore({ props: props });
     };
 
-    const attachKeyboardEvent = (event: any, eventType: KeyboardEvent) => {
-        onKeyboardEvent({
+    const attachKeyboardEventEnum = (
+        event: any,
+        eventType: KeyboardEventEnum
+    ) => {
+        onKeyboardEventEnum({
             props: props,
             event: event,
-            keyboardEvent: eventType,
+            KeyboardEventEnum: eventType,
             isEmpty: isEmpty,
         });
     };
@@ -90,13 +93,13 @@
             on:click={onTextClick}
             on:focus={onTextFocus}
             on:keydown={(event) => {
-                attachKeyboardEvent(event, KeyboardEvent.OnKeyDown);
+                attachKeyboardEventEnum(event, KeyboardEventEnum.OnKeyDown);
             }}
             on:keypress={(event) => {
-                attachKeyboardEvent(event, KeyboardEvent.OnKeyPress);
+                attachKeyboardEventEnum(event, KeyboardEventEnum.OnKeyPress);
             }}
             on:keyup={(event) => {
-                attachKeyboardEvent(event, KeyboardEvent.OnKeyUp);
+                attachKeyboardEventEnum(event, KeyboardEventEnum.OnKeyUp);
             }}
         />
     {:else}
@@ -110,13 +113,16 @@
                 on:click={onTextClick}
                 on:focus={onTextFocus}
                 on:keydown={(event) => {
-                    attachKeyboardEvent(event, KeyboardEvent.OnKeyDown);
+                    attachKeyboardEventEnum(event, KeyboardEventEnum.OnKeyDown);
                 }}
                 on:keypress={(event) => {
-                    attachKeyboardEvent(event, KeyboardEvent.OnKeyPress);
+                    attachKeyboardEventEnum(
+                        event,
+                        KeyboardEventEnum.OnKeyPress
+                    );
                 }}
                 on:keyup={(event) => {
-                    attachKeyboardEvent(event, KeyboardEvent.OnKeyUp);
+                    attachKeyboardEventEnum(event, KeyboardEventEnum.OnKeyUp);
                 }}
             />
         </del>

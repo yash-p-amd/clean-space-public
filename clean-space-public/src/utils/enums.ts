@@ -1,6 +1,8 @@
 export enum TextEditorEvent {
     SelectAll = "SelectAll",
     Select = "Select",
+    SelectUp = "SelectUp",
+    SelectDown = "SelectDown",
     Copy = "Copy",
     CopyAll = "CopyAll",
     Paste = "Paste",
@@ -14,7 +16,7 @@ export enum TextEditorEvent {
     NewLine = "NewLine",
 }
 
-export enum KeyboardEvent {
+export enum KeyboardEventEnum {
     OnKeyDown = "OnKeyDown",
     OnKeyUp = "OnKeyUp",
     OnKeyPress = "OnKeyPress"

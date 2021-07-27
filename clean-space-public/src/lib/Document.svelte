@@ -139,6 +139,17 @@
                 eventData.type
             );
         }
+
+        if (eventData.event === TextEditorEvent.SelectUp) {
+            console.log("Select up");
+        }
+
+        if (eventData.event === TextEditorEvent.SelectDown) {
+            console.log("Select down");
+            var nextIndex = getIndexOfNextNode();
+            var nextEle = storage[nextIndex];
+            elements[nextEle.componentProps.id].setIsSelected(true);
+        }
     };
 
     function switch_isSelected(value: boolean) {
@@ -164,6 +175,26 @@
             storage.splice(index, 0, data);
             storage = storage;
         }
+    }
+
+    function getIndexOfNextNode(): number {
+        let index = storage.length - 1;
+        storage.forEach((ele, i) => {
+            if (ele.componentProps.id === $focusedComponent.id) {
+                index = i + 1;
+            }
+        });
+        return index < 0 ? 0 : index;
+    }
+
+    function getIndexOfPreviousNode(): number {
+        let index = storage.length - 1;
+        storage.forEach((ele, i) => {
+            if (ele.componentProps.id === $focusedComponent.id) {
+                index = i - 1;
+            }
+        });
+        return index < 0 ? 0 : index;
     }
 
     function componentDataFactory(tool: Tool): DocumentData {
