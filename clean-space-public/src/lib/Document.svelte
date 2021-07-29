@@ -52,7 +52,7 @@
     }
 
     afterUpdate(() => {
-        switch_isSelected(false);
+        //switch_isSelected(false);
     });
 
     const onToolBoxEventData = (event) => {
@@ -140,15 +140,14 @@
             );
         }
 
-        if (eventData.event === TextEditorEvent.SelectUp) {
-            console.log("Select up");
-        }
-
-        if (eventData.event === TextEditorEvent.SelectDown) {
-            console.log("Select down");
-            var nextIndex = getIndexOfNextNode();
-            var nextEle = storage[nextIndex];
-            elements[nextEle.componentProps.id].setIsSelected(true);
+        if (
+            eventData.event === TextEditorEvent.SelectUp ||
+            eventData.event === TextEditorEvent.SelectDown
+        ) {
+            var index = getIndexOfSiblingComponent(eventData.event);
+            var sibling = storage[index];
+            elements[sibling.componentProps.id].setFocus();
+            elements[sibling.componentProps.id].setIsSelected(true);
         }
     };
 
@@ -195,6 +194,20 @@
             }
         });
         return index < 0 ? 0 : index;
+    }
+
+    function getIndexOfSiblingComponent(event: TextEditorEvent): number {
+        let minRange = 0;
+        let maxRange = storage.length - 1;
+        let index = event === TextEditorEvent.SelectUp ? minRange : maxRange;
+        storage.forEach((ele, i) => {
+            if (ele.componentProps.id === $focusedComponent.id) {
+                index = event === TextEditorEvent.SelectUp ? i - 1 : i + 1;
+            }
+        });
+        if (index < 0) index = minRange;
+        if (index > storage.length - 1) index = maxRange;
+        return index;
     }
 
     function componentDataFactory(tool: Tool): DocumentData {

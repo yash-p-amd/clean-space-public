@@ -37,7 +37,7 @@ export const dispatchTextEditorEvent = (model: { props: ComponentProps, event: T
         props: model.props,
     }
 
-    console.log(`Dispatching : ${eData.event} -> ${eData.id}`);
+    //console.log(`Dispatching : ${eData.event} -> ${eData.id}`);
     model.props.afterMount.eventDispatcher("message", eData);
     return model;
 };
@@ -49,10 +49,11 @@ export const onKeyboardEventEnum = (model: { props: ComponentProps, event: any, 
     let isTextEmpty = model.isEmpty;
     let modelKeyboardEventEnum = model.KeyboardEventEnum;
 
+    if (isShiftKey) updateStore_isShiftPressed(modelKeyboardEventEnum);
+
     if (isUnwantedKeyboardEventEnum(keyCode, modelKeyboardEventEnum)) return;
 
     if (isTextEditorEvent(isCtrlKey, keyCode)) {
-        if (isShiftKey) updateStore_isShiftPressed(modelKeyboardEventEnum);
         let editorEvent = resolveTextEditorEvent(isShiftKey, isCtrlKey, isTextEmpty, keyCode);
         if (editorEvent === TextEditorEvent.Typing) return;
         model.props.afterMount.isSelected = true;
@@ -103,8 +104,8 @@ function isUnwantedKeyboardEventEnum(key: string, modelKeyboardEventEnum: any): 
     if (key === Key.Enter && (modelKeyboardEventEnum === KeyboardEventEnum.OnKeyPress || modelKeyboardEventEnum === KeyboardEventEnum.OnKeyUp)) return true;
     if (key === Key.Backspace && (modelKeyboardEventEnum === KeyboardEventEnum.OnKeyPress || modelKeyboardEventEnum === KeyboardEventEnum.OnKeyUp)) return true;
     if (key === Key.ControlLeft || key === Key.ControlRight) return true;
-    if ((key === Key.ShiftLeft || key === Key.ShiftRight) && modelKeyboardEventEnum === KeyboardEventEnum.OnKeyPress) return true;
-    console.log(`${key} : ${modelKeyboardEventEnum}`);
+    if ((key === Key.ShiftLeft || key === Key.ShiftRight) && modelKeyboardEventEnum === KeyboardEventEnum.OnKeyPress || modelKeyboardEventEnum === KeyboardEventEnum.OnKeyUp) return true;
+    //console.log(`${key} : ${modelKeyboardEventEnum}`);
     return false;
 }
 
