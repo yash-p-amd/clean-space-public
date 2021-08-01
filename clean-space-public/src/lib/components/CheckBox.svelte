@@ -76,6 +76,12 @@
         isSelected = value;
         props.afterMount.isSelected = value;
     };
+
+    export const setFocusOnNodeAndSelect = () => {
+        setFocusOnNode({ props: props });
+        setCaretPosition(props.afterMount.mainNode, text.length);
+        setIsSelected(true);
+    };
 </script>
 
 <div

@@ -146,8 +146,9 @@
         ) {
             var index = getIndexOfSiblingComponent(eventData.event);
             var sibling = storage[index];
-            elements[sibling.componentProps.id].setFocus();
-            elements[sibling.componentProps.id].setIsSelected(true);
+            // elements[sibling.componentProps.id].setFocus();
+            // elements[sibling.componentProps.id].setIsSelected(true);
+            elements[sibling.componentProps.id].setFocusOnNodeAndSelect();
         }
     };
 

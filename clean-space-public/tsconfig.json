@@ -30,6 +30,7 @@
     "checkJs": true,
     "disableSizeLimit": true,
     "strictNullChecks": true,
+    "noImplicitUseStrict": false,
   },
   /**
    * Use global.d.ts instead of compilerOptions.types
