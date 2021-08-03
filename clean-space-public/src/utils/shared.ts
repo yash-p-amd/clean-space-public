@@ -1,9 +1,8 @@
-import { TextEditorEvent, Key, Tool, KeyboardEventEnum, ComponentPosition } from "./enums";
+import { TextEditorEvent, Key, Tool, KeyboardEventEnum, ComponentPosition, InsertPreference } from "./enums";
 import { focusedComponent, lastTextEditorEvent, isShiftPressed } from "../utils/store";
 import type { ComponentEventData, ComponentProps } from "./interfaces";
 import { compute_rest_props, debug, text } from "svelte/internal";
 import { get } from 'svelte/store';
-
 
 function foo(model: { property1: number; property2: number }) {
     model.property1++;
@@ -81,6 +80,21 @@ function isTextEditorEvent(isCtrlKey: boolean, key: string): boolean {
     if (extractKey !== undefined && keys.indexOf(Key[extractKey]) > -1)
         return true;
     return false;
+}
+
+export const removeFromArray = (arg: { refEle: any, col: any[] }): any[] => {
+    let refIndex = arg.col.findIndex(item => item === arg.refEle);
+    if (refIndex === -1) return arg.col;
+    arg.col.splice(refIndex, 1);
+    return arg.col;
+}
+
+export const addInArray = (arg: { pref: InsertPreference, newEle: any, refEle: any, col: any[] }): any[] => {
+    let refIndex = arg.col.findIndex(ele => ele === arg.refEle);
+    if (refIndex === -1) return arg.col;
+    refIndex = arg.pref === InsertPreference.AtReference ? refIndex : refIndex + 1;
+    arg.col.splice(refIndex, 0, arg.newEle);
+    return arg.col;
 }
 
 //resolveKeyboardEventEnum(keyCode, model.KeyboardEventEnum)

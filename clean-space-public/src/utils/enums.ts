@@ -61,3 +61,8 @@ export enum ComponentPosition {
     InsertAtCaret = "InsertAtCaret",
     InsertAtLast = "InsertAtLast",
 }
+
+export enum InsertPreference {
+    AtReference = "AtReference",
+    AfterReference = "AfterReference"
+}
