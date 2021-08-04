@@ -7,6 +7,9 @@
   <img src={logo} alt="Svelte Logo" />
   <h1>Hello Typescript!</h1>
 
+  <!-- <Document /> -->
+  <!-- <svelte:component this={Document} /> -->
+
   <Document />
 
   <p>

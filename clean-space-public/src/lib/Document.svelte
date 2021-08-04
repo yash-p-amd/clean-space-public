@@ -1,197 +1,293 @@
 <script lang="ts">
-    //imports
+    import { onMount, afterUpdate } from "svelte";
+    import CheckBox from "./components/CheckBox.svelte";
     import ToolBox from "./ToolBox.svelte";
-    import { tick } from "svelte";
-    import { Tool, ToolBoxEventData } from "../statics/ToolBoxEvent";
-    import { Key } from "../constants/Key";
-    import { onMount } from "svelte";
-    import { generateUniqueID, replaceAllRegEx } from "../utils/utils";
+    import Text from "./components/Text.svelte";
+    import { util } from "../utils/helper";
+    import type {
+        ComponentProps,
+        DocumentData,
+        ToolBoxEventData,
+        ComponentEventData,
+    } from "../utils/interfaces";
+    import {
+        Tool,
+        TextEditorEvent,
+        ComponentPosition,
+        Key,
+    } from "../utils/enums";
+    import { tick } from "svelte/internal";
+    import { focusedComponent } from "../utils/store";
+    import Header1 from "./components/headers/Header1.svelte";
 
-    //svelte constants
-    //variables
-    let mainHero;
     let toolBox;
-    //let trackLastElement: Tool = Tool.None;
-    $: contentText = "";
-    $: isToolBoxVisible = false;
+    let storage: DocumentData[] = [];
 
-    //custom functionality
-    onMount(() => {
-        mainHero.focus();
+    // $: storage, console.log(storage);
+    // $: $caretNode && console.log($caretNode);
+
+    let elements = {};
+
+    $: {
+        //console.log($focusedComponent?.id);
+    }
+
+    $: {
+        let dirty = false;
+        Object.getOwnPropertyNames(elements).forEach((key) => {
+            if (elements[key] === null) {
+                delete elements[key];
+                dirty = true;
+            }
+        });
+        if (dirty) {
+            elements = elements;
+        }
+    }
+
+    $: {
+        Object.getOwnPropertyNames(elements).forEach((key) => {
+            //console.log(key);
+        });
+    }
+
+    afterUpdate(() => {
+        //switch_isSelected(false);
     });
 
-    const onKeyPress = async (e) => {
-        //"/"
-        if (e.code === Key.slash && !e.shiftKey) {
-            toggleToolBox();
+    const onToolBoxEventData = (event) => {
+        let eventData = event.detail as ToolBoxEventData;
+        insertComponent(ComponentPosition.InsertAtLast, eventData.selectedTool);
+    };
+
+    const onToolFocus = () => {
+        //console.log("onToolFocus");
+    };
+
+    const onKeydown = (event) => {
+        //console.log(event);
+    };
+
+    const onKeyup = (event) => {
+        //console.log(event);
+    };
+
+    const onKeyPress = (event) => {
+        // if (event.code == Keys.Enter && !event.shiftKey) {
+        //     event.preventDefault();
+        //     if ($focusedComponent?.type === Tool.Checkbox) {
+        //         insertComponent(
+        //             ComponentPosition.InsertAfterCaret,
+        //             Tool.Checkbox
+        //         );
+        //         return;
+        //     }
+        //     insertComponent(ComponentPosition.InsertAfterCaret, Tool.Text);
+        //     return;
+        // }
+        // event.preventDefault();
+        // console.log($focusedComponent);
+        // console.log(elements[$focusedComponent.id]);
+        //elements[$focusedComponent.id].compOnKeyPress(event);
+    };
+
+    const removeComponent = async (
+        removeEvent: TextEditorEvent,
+        callback: Function
+    ) => {
+        let siblingId = getPreviousSiblingId_isSelected(storage);
+        storage = storage.filter(
+            (comp) => !comp.componentProps.afterMount.isSelected
+        );
+        if (removeEvent === TextEditorEvent.Delete) {
+            elements[siblingId].setFocus();
+        }
+        await tick();
+        callback();
+    };
+
+    function getPreviousSiblingId_isSelected(input: DocumentData[]): string {
+        let firstMatchIndex = input.findIndex(
+            (ele) => ele.componentProps.afterMount.isSelected
+        );
+        let previousSiblingIndex =
+            firstMatchIndex > 0 ? firstMatchIndex - 1 : 0;
+        return input[previousSiblingIndex].componentProps.id;
+    }
+
+    const handleMessage = (event) => {
+        let eventData = event.detail as ComponentEventData;
+
+        if (
+            eventData.event === TextEditorEvent.Delete ||
+            eventData.event === TextEditorEvent.DeleteAll
+        ) {
+            removeComponent(eventData.event, () => {
+                switch_isSelected(false);
+            });
             return;
         }
 
-        //"Enter"
-        // if (e.code === Key.Enter) {
-        //     debugger;
-        //     if (isCurrentLineEmpty()) {
-        //         e.preventDefault();
-        //         return;
-        //     }
-        //     return;
-        // }
-
-        //Checkbox -> "Enter"
-        // if (
-        //     e.code === Key.Enter &&
-        //     !e.shiftKey &&
-        //     trackLastElement === Tool.Checkbox
-        // ) {
-        //     e.preventDefault();
-        //     insertCheckbox();
-        //     return;
-        // }
-
-        //"Shift" + "Enter"
-        // if (e.shiftKey && e.code === Key.Enter) {
-        //     //trackLastElement = Tool.None;
-        //     return;
-        // }
-        hideToolBox();
-    };
-
-    const onToolFocus = () => {};
-
-    const displayToolBox = () => {
-        isToolBoxVisible = true;
-    };
-
-    const hideToolBox = async () => {
-        isToolBoxVisible = false;
-    };
-
-    const toggleToolBox = () => {
-        isToolBoxVisible = isToolBoxVisible ? false : true;
-    };
-
-    const onToolBoxEventData = async (event) => {
-        let eventData = event.detail as ToolBoxEventData;
-        globalInsertElement(eventData.selectedTool, eventData.selectedToolHtml);
-        mainHero.focus();
-        hideToolBox();
-    };
-
-    const insertCheckbox = async () => {
-        globalInsertElement(
-            Tool.Checkbox,
-            '<div><input id=${uID} type="checkbox"><label for=${uID}></label></div>'
-        );
-    };
-
-    const globalInsertElement = async (tool: Tool, innerHtml: string) => {
-        setCaret();
-
-        await tick();
-
-        contentText = replaceAllRegEx(contentText, /<div><br><\/div>$/gim, "");
-        contentText = replaceAllRegEx(
-            contentText,
-            /<div>&nbsp;<\/div>$/gim,
-            ""
-        );
-        contentText = replaceAllRegEx(contentText, /<br>$/gim, "");
-
-        await tick();
-
-        let uID = generateUniqueID(tool);
-        innerHtml = innerHtml.replaceAll("${uID}", uID);
-        contentText = contentText + innerHtml;
-        //trackLastElement = tool;
-        setCaret();
-    };
-
-    const insertNewLine = async () => {
-        setCaret();
-        contentText = contentText + `<br>`;
-        setCaret();
-    };
-
-    const setCaret = async () => {
-        await tick();
-        console.log(contentText);
-        let range = document.createRange();
-        let sel = window.getSelection();
-
-        range.setStartAfter(
-            mainHero.childNodes[mainHero.childNodes.length - 1]
-        );
-        range.collapse(true);
-
-        sel.removeAllRanges();
-        sel.addRange(range);
-    };
-
-    const isCurrentLineEmpty = () => {
-        debugger;
-        var docSelection = document.getSelection();
-        if (docSelection.anchorNode.data === undefined) {
-            if (docSelection.anchorNode.innerText === undefined) {
-                return true;
-            }
+        if (eventData.event === TextEditorEvent.SelectAll) {
+            switch_isSelected(true);
+            return;
         }
-        return false;
+
+        if (eventData.event === TextEditorEvent.NewLine) {
+            insertComponent(
+                eventData.props.afterMount.insertPositionPreference,
+                eventData.type
+            );
+        }
+
+        if (
+            eventData.event === TextEditorEvent.SelectUp ||
+            eventData.event === TextEditorEvent.SelectDown
+        ) {
+            var index = getIndexOfSiblingComponent(eventData.event);
+            var sibling = storage[index];
+            // elements[sibling.componentProps.id].setFocus();
+            // elements[sibling.componentProps.id].setIsSelected(true);
+            elements[sibling.componentProps.id].setFocusOnNodeAndSelect();
+        }
     };
+
+    function switch_isSelected(value: boolean) {
+        Object.getOwnPropertyNames(elements).forEach((key) => {
+            elements[key]?.setIsSelected(value);
+        });
+    }
+
+    function insertComponent(position: ComponentPosition, tool: Tool) {
+        let data = componentDataFactory(tool);
+
+        if (position === ComponentPosition.InsertAtLast) {
+            storage = [...storage, data];
+            return;
+        }
+        if (position === ComponentPosition.InsertAfterCaret) {
+            let index = storage.length - 1;
+            storage.forEach((ele, i) => {
+                if (ele.componentProps.id === $focusedComponent.id) {
+                    index = i + 1;
+                }
+            });
+            storage.splice(index, 0, data);
+            storage = storage;
+        }
+    }
+
+    function getIndexOfNextNode(): number {
+        let index = storage.length - 1;
+        storage.forEach((ele, i) => {
+            if (ele.componentProps.id === $focusedComponent.id) {
+                index = i + 1;
+            }
+        });
+        return index < 0 ? 0 : index;
+    }
+
+    function getIndexOfPreviousNode(): number {
+        let index = storage.length - 1;
+        storage.forEach((ele, i) => {
+            if (ele.componentProps.id === $focusedComponent.id) {
+                index = i - 1;
+            }
+        });
+        return index < 0 ? 0 : index;
+    }
+
+    function getIndexOfSiblingComponent(event: TextEditorEvent): number {
+        let minRange = 0;
+        let maxRange = storage.length - 1;
+        let index = event === TextEditorEvent.SelectUp ? minRange : maxRange;
+        storage.forEach((ele, i) => {
+            if (ele.componentProps.id === $focusedComponent.id) {
+                index = event === TextEditorEvent.SelectUp ? i - 1 : i + 1;
+            }
+        });
+        if (index < 0) index = minRange;
+        if (index > storage.length - 1) index = maxRange;
+        return index;
+    }
+
+    function componentDataFactory(tool: Tool): DocumentData {
+        if (tool === Tool.Checkbox) {
+            return {
+                component: CheckBox,
+                componentProps: {
+                    id: util.generateNewId(tool),
+                    index: storage.length,
+                    type: tool,
+                    afterMount: {
+                        insertPositionPreference:
+                            ComponentPosition.InsertAfterCaret,
+                        isSelected: false,
+                        mainNode: null,
+                        eventDispatcher: null,
+                    },
+                },
+            };
+        }
+        if (tool === Tool.Header1) {
+            return {
+                component: Header1,
+                componentProps: {
+                    id: util.generateNewId(tool),
+                    index: storage.length,
+                    type: tool,
+                    afterMount: {
+                        insertPositionPreference:
+                            ComponentPosition.InsertAfterCaret,
+                        isSelected: false,
+                        mainNode: null,
+                        eventDispatcher: null,
+                    },
+                },
+            };
+        }
+        if (tool == Tool.Text) {
+            return {
+                component: Text,
+                componentProps: {
+                    id: util.generateNewId(tool),
+                    index: storage.length,
+                    type: tool,
+                    afterMount: {
+                        insertPositionPreference:
+                            ComponentPosition.InsertAfterCaret,
+                        isSelected: false,
+                        mainNode: null,
+                        eventDispatcher: null,
+                    },
+                },
+            };
+        }
+        throw new Error(`Invalid tool : ${tool}`);
+    }
 </script>
 
 <div
-    bind:this={mainHero}
-    bind:innerHTML={contentText}
-    on:keypress|stopPropagation={onKeyPress}
     contenteditable="true"
-    class="cpd-main"
+    on:keypress={onKeyPress}
+    on:keydown={onKeydown}
+    on:keyup={onKeyup}
+>
+    {#each storage as { component, componentProps }, index (componentProps.id)}
+        <svelte:component
+            this={component}
+            props={componentProps}
+            bind:this={elements[componentProps.id]}
+            on:message={handleMessage}
+        />
+    {/each}
+</div>
+
+<ToolBox
+    bind:this={toolBox}
+    on:message={onToolBoxEventData}
+    on:focus={onToolFocus}
 />
 
-{contentText}
-
-<pre />
-
-{#if isToolBoxVisible}
-    <ToolBox
-        bind:this={toolBox}
-        on:message={onToolBoxEventData}
-        on:focus={onToolFocus}
-    />
-{/if}
-
 <style>
-    .cpd-main {
-        text-align: left;
-        white-space: pre-line;
-        border: solid;
-        /* background-color: #eee; */
-        /* max-width: 14rem; */
-        margin: 1rem auto;
-        line-height: 1.35;
-    }
-    :global(.forecast) {
-        margin: 0;
-        padding: 0.3rem;
-        background-color: #eee;
-        font: 1rem "Fira Sans", sans-serif;
-    }
-
-    /* :global(.forecast) > h1, */
-    :global(.day-forecast) {
-        margin: 0.5rem;
-        padding: 0.3rem;
-        font-size: 1.2rem;
-    }
-
-    /*Place SVG to right side of a card*/
-    /* :global(.day-forecast) {
-        background: right/contain content-box border-box no-repeat
-            url("../../public/favicon.ico") white;
-    } */
-
-    /* :global(.day-forecast) > h2, */
-    :global(.day-forecast) > p {
-        margin: 0.2rem;
-        font-size: 1rem;
-    }
 </style>
